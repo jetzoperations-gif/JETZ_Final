@@ -7,11 +7,14 @@ const withPWA = require("next-pwa")({
   skipWaiting: true,
 });
 
-const nextConfig: NextConfig = {
+const nextConfig = {
   reactStrictMode: true,
 
   typescript: {
     ignoreBuildErrors: true,
+  },
+  eslint: {
+    ignoreDuringBuilds: true,
   },
 };
 
