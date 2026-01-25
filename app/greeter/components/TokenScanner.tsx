@@ -40,8 +40,11 @@ export default function TokenScanner({ onTokenVerified }: TokenScannerProps) {
             .eq('id', tokenId)
             .single()
 
-        if (error || !data) {
-            setError('Token not found')
+        if (error) {
+            setError(`DB Error: ${error.message} (${error.code})`)
+            console.error(error)
+        } else if (!data) {
+            setError('Token ID not found in database.')
         } else if (data.status !== 'available') {
             setError(`Token is currently ${data.status}`)
         } else {
@@ -67,7 +70,15 @@ export default function TokenScanner({ onTokenVerified }: TokenScannerProps) {
                 // Scanners usually send "Enter" key
                 />
 
-                {error && <p className="text-red-500 font-medium">{error}</p>}
+                {error && (
+                    <div className="text-red-500 font-medium text-sm bg-red-50 p-3 rounded border border-red-200">
+                        <p className="font-bold">Error:</p>
+                        {error}
+                        <p className="text-xs mt-2 text-gray-500">
+                            (If this says "JSON" or "Network", your Vercel Env Vars might be missing)
+                        </p>
+                    </div>
+                )}
 
                 <button
                     type="submit"
