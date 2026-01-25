@@ -60,7 +60,7 @@ export default function TokenScanner({ onTokenVerified }: TokenScannerProps) {
                 <input
                     ref={inputRef}
                     type="number"
-                    className="w-full text-center text-2xl font-mono p-3 border-2 border-blue-200 rounded-lg focus:border-blue-500 outline-none"
+                    className="w-full text-center text-2xl font-mono p-3 border-2 border-blue-200 rounded-lg focus:border-blue-500 outline-none text-gray-900 bg-white placeholder:text-gray-400"
                     placeholder="Token #"
                     value={inputVal}
                     onChange={(e) => setInputVal(e.target.value)}
