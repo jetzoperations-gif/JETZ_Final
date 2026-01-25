@@ -1,19 +1,39 @@
-import MainLayout from '@/components/MainLayout';
+'use client'
+
+import { useState } from 'react'
+import MainLayout from '@/components/MainLayout'
+import ActiveOrdersGrid from './components/ActiveOrdersGrid'
+import ConsumablesModal from './components/ConsumablesModal'
+import { Database } from '@/lib/database.types'
+
+type Order = Database['public']['Tables']['orders']['Row'] & {
+    vehicle_types: { name: string } | null
+}
 
 export default function BaristaPage() {
+    const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
+
     return (
-        <MainLayout title="Barista Station" role="staff">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div className="lg:col-span-2 space-y-4">
-                    <h2 className="text-lg font-semibold">Ready to Order</h2>
-                    {/* Order taking interface */}
+        <MainLayout title="Cafe & Sales Log" role="staff">
+            <div className="max-w-6xl mx-auto">
+                <div className="mb-6 flex justify-between items-end">
+                    <div>
+                        <h2 className="text-2xl font-bold text-gray-800">Operations Board</h2>
+                        <p className="text-gray-500">Tap a job to log consumables.</p>
+                    </div>
                 </div>
-                <div className="bg-white p-4 rounded-lg shadow h-fit">
-                    <h2 className="text-lg font-semibold mb-4">Active Orders</h2>
-                    {/* Order queue */}
-                    <div className="text-gray-500 text-sm">No active drink orders.</div>
-                </div>
+
+                <ActiveOrdersGrid onSelectOrder={setSelectedOrder} />
+
+                {selectedOrder && (
+                    <ConsumablesModal
+                        orderId={selectedOrder.id}
+                        tokenId={selectedOrder.token_id || 0}
+                        vehicleName={selectedOrder.vehicle_types?.name || 'Vehicle'}
+                        onClose={() => setSelectedOrder(null)}
+                    />
+                )}
             </div>
         </MainLayout>
-    );
+    )
 }
