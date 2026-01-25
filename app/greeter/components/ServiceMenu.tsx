@@ -1,55 +1,57 @@
 'use client'
 
-import { Service, ServicePrice } from '@/lib/types'
+import { useState, useEffect } from 'react'
+import { supabase } from '@/lib/supabase'
+import { Database } from '@/lib/database.types'
+import { usePriceMatrix } from '@/lib/hooks/usePriceMatrix'
+
+type Service = Database['public']['Tables']['services']['Row']
 
 interface ServiceMenuProps {
-    services: Service[]
-    prices: ServicePrice[]
-    vehicleTypeId: number | null
-    onSelect: (serviceId: number) => void
-    selectedServiceId: number | null
+    vehicleTypeId: number
+    onSelect: (service: Service, price: number) => void
+    onBack: () => void
 }
 
-export function ServiceMenu({ services, prices, vehicleTypeId, onSelect, selectedServiceId }: ServiceMenuProps) {
+export default function ServiceMenu({ vehicleTypeId, onSelect, onBack }: ServiceMenuProps) {
+    const [services, setServices] = useState<Service[]>([])
+    const { getPrice, loading: priceLoading } = usePriceMatrix()
 
-    const getPrice = (serviceId: number) => {
-        // If no vehicle selected, show base/sedan price (assumed id 1) or range
-        const vId = vehicleTypeId || 1
-        const match = prices.find(p => p.service_id === serviceId && p.vehicle_type_id === vId)
-        return match ? match.price : 0
-    }
+    useEffect(() => {
+        supabase.from('services').select('*').order('id').then(({ data }) => {
+            if (data) setServices(data)
+        })
+    }, [])
+
+    if (priceLoading) return <div className="p-10 text-center">Loading prices...</div>
 
     return (
-        <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 mt-4">
-            <h3 className="text-sm font-semibold text-gray-500 uppercase mb-3">3. Select Service</h3>
+        <div className="space-y-4 animate-in fade-in slide-in-from-right-8 duration-500">
+            <div className="flex items-center justify-between">
+                <button onClick={onBack} className="text-sm font-semibold text-gray-500 hover:text-gray-800">
+                    &larr; Change Vehicle
+                </button>
+                <h2 className="text-xl font-bold">Select Service</h2>
+                <div className="w-20"></div> {/* Spacer */}
+            </div>
 
-            <div className="space-y-2">
-                {services.map((s) => {
-                    const price = getPrice(s.id)
-                    const isSelected = selectedServiceId === s.id
-
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {services.map((service) => {
+                    const price = getPrice(service.id, vehicleTypeId)
                     return (
                         <button
-                            key={s.id}
-                            onClick={() => onSelect(s.id)}
-                            className={`w-full p-4 rounded-lg flex justify-between items-center transition-all border-2 ${isSelected
-                                    ? 'border-blue-600 bg-blue-600 text-white shadow-lg'
-                                    : 'border-gray-100 bg-white text-gray-800 hover:border-gray-300'
-                                }`}
+                            key={service.id}
+                            onClick={() => onSelect(service, price)}
+                            className="flex justify-between items-center p-4 bg-white border rounded-lg hover:bg-blue-50 hover:border-blue-300 shadow-sm text-left group"
                         >
-                            <span className="font-bold">{s.name}</span>
-                            <span className={`text-lg font-mono ${isSelected ? 'text-white' : 'text-blue-600 font-bold'}`}>
+                            <span className="font-medium group-hover:text-blue-700">{service.name}</span>
+                            <span className="font-bold text-green-600 bg-green-50 px-2 py-1 rounded">
                                 ₱{price}
                             </span>
                         </button>
                     )
                 })}
             </div>
-            {!vehicleTypeId && (
-                <p className="text-xs text-center text-orange-500 mt-2 italic">
-                    * Showing base prices. Select vehicle to see exact rate.
-                </p>
-            )}
         </div>
     )
 }

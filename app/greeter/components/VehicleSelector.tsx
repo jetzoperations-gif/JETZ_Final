@@ -1,39 +1,43 @@
 'use client'
 
-import { VehicleType } from '@/lib/types'
+import { useState, useEffect } from 'react'
+import { supabase } from '@/lib/supabase'
+import { Database } from '@/lib/database.types'
 import { Car, Truck, Bus } from 'lucide-react'
 
+type VehicleType = Database['public']['Tables']['vehicle_types']['Row']
+
 interface VehicleSelectorProps {
-    vehicleTypes: VehicleType[]
-    selectedVehicleId: number | null
-    onSelect: (id: number) => void
+    onSelect: (vehicle: VehicleType) => void
 }
 
-export function VehicleSelector({ vehicleTypes, selectedVehicleId, onSelect }: VehicleSelectorProps) {
-    // Helper to get icon
+export default function VehicleSelector({ onSelect }: VehicleSelectorProps) {
+    const [types, setTypes] = useState<VehicleType[]>([])
+
+    useEffect(() => {
+        supabase.from('vehicle_types').select('*').order('sort_order').then(({ data }) => {
+            if (data) setTypes(data)
+        })
+    }, [])
+
     const getIcon = (name: string) => {
-        if (name.includes('Sedan')) return <Car size={24} />
-        if (name.includes('SUV')) return <Truck size={24} />
-        if (name.includes('Van')) return <Bus size={24} />
-        return <Car size={24} />
+        if (name.includes('Van') || name.includes('XL')) return <Bus size={32} />
+        if (name.includes('SUV')) return <Truck size={32} />
+        return <Car size={32} />
     }
 
     return (
-        <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 mt-4">
-            <h3 className="text-sm font-semibold text-gray-500 uppercase mb-3">2. Select Vehicle Type</h3>
-
-            <div className="grid grid-cols-3 gap-2">
-                {vehicleTypes.map((v) => (
+        <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <h2 className="text-xl font-bold text-center">Select Vehicle Type</h2>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                {types.map((type) => (
                     <button
-                        key={v.id}
-                        onClick={() => onSelect(v.id)}
-                        className={`p-3 rounded-lg flex flex-col items-center justify-center gap-2 transition-all border-2 ${selectedVehicleId === v.id
-                                ? 'border-blue-600 bg-blue-50 text-blue-700'
-                                : 'border-transparent bg-gray-50 text-gray-600 hover:bg-gray-100'
-                            }`}
+                        key={type.id}
+                        onClick={() => onSelect(type)}
+                        className="flex flex-col items-center justify-center p-6 bg-white border-2 border-gray-200 rounded-xl hover:border-blue-500 hover:bg-blue-50 transition-all shadow-sm"
                     >
-                        {getIcon(v.name)}
-                        <span className="text-xs font-bold text-center">{v.name}</span>
+                        <div className="text-gray-600 mb-2">{getIcon(type.name)}</div>
+                        <span className="font-bold text-lg">{type.name}</span>
                     </button>
                 ))}
             </div>

@@ -1,33 +1,49 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
-import { ServicePrice } from '@/lib/types'
+
+export type PriceMatrixItem = {
+    service_id: number
+    service_name: string
+    vehicle_type_id: number
+    price: number
+}
 
 export function usePriceMatrix() {
-    const [prices, setPrices] = useState<ServicePrice[]>([])
+    const [matrix, setMatrix] = useState<PriceMatrixItem[]>([])
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
-        fetchPrices()
+        const fetchMatrix = async () => {
+            const { data, error } = await supabase
+                .from('service_prices')
+                .select(`
+                price,
+                vehicle_type_id,
+                service_id,
+                services (name)
+            `)
+
+            if (data) {
+                const formatted = data.map((item: any) => ({
+                    service_id: item.service_id,
+                    service_name: item.services.name,
+                    vehicle_type_id: item.vehicle_type_id,
+                    price: item.price
+                }))
+                setMatrix(formatted)
+            }
+            setLoading(false)
+        }
+
+        fetchMatrix()
     }, [])
 
-    const fetchPrices = async () => {
-        const { data, error } = await supabase
-            .from('service_prices')
-            .select('*')
-
-        if (!error && data) {
-            setPrices(data)
-        }
-        setLoading(false)
-    }
-
-    const getPrice = (serviceId: number, vehicleTypeId: number | null): number => {
-        if (!vehicleTypeId) return 0 // or base price?
-        const match = prices.find(
-            p => p.service_id === serviceId && p.vehicle_type_id === vehicleTypeId
+    const getPrice = (serviceId: number, vehicleTypeId: number) => {
+        const item = matrix.find(
+            (m) => m.service_id === serviceId && m.vehicle_type_id === vehicleTypeId
         )
-        return match ? match.price : 0
+        return item ? item.price : 0
     }
 
-    return { prices, loading, getPrice }
+    return { matrix, getPrice, loading }
 }
