@@ -57,7 +57,7 @@ export default function TokenScanner({ onTokenVerified }: TokenScannerProps) {
     return (
         <div className="bg-white p-6 rounded-lg shadow-sm border text-center">
             <ScanLine size={48} className="mx-auto text-blue-500 mb-4" />
-            <h2 className="text-xl font-bold mb-4">Scan QR Token</h2>
+            <h2 className="text-xl font-bold mb-4">Scan QR Token <span className="text-xs text-gray-300 font-normal">(v1.1)</span></h2>
 
             <form onSubmit={handleVerify} className="max-w-xs mx-auto space-y-4">
                 <input
