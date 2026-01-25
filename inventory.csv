@@ -1,0 +1,46 @@
+INVENTORY     ITEMS,,"OPENING
+STOCK",,"TOTAL
+ITEM","TOTAL
+SOLD",SALE,"CLOSING
+STOCK",REMARKS,"NEW ITEM
+RECIEVED","TOTAL
+STOCKS",,
+SOFTDRINKS:,PHP 25,,,,,,,,,,,
+WATER:,PHP-25,,,,,,,,,,,
+SNACKS-LRG-,PHP-25,,,,,,,,,,,
+SNACK-MED:,PHP-20,,,,,,,,,,,
+SNAKC-SML :,PHP-15,,,,,,,,,,,
+COFFEE CUPS:,PHP-120,,,,,,,,,,,
+"PLASTIC
+CUPS:",PHP-120,,,,,,,,,,,
+,,,,,,,,,,,,
+VS1-:,PHP-250,,,,,,,,,,,
+99 PRO WW,PHP-250,,,,,,,,,,,
+"CABIN
+FILTER:",PHP-500,,,,,,,,,,,
+MXR-HORN,PHP-1800,,,,,,,,,,,
+BREAK CLNR,PHP-300,,,,,,,,,,,
+EXPENSES:,,,,,TOTAL:,,,NET:,,,,
+INVENTORY     ITEMS,,,"OPENING
+STOCK","TOTAL
+ITEM","TOTAL
+SOLD",SALE,"CLOSING
+STOCK",REMARKS,"NEW ITEM
+RECIEVED",,"TOTAL
+STOCKS",
+SOFTDRINKS:,PHP 25,,,,,,,,,,,
+WATER:,PHP-25,,,,,,,,,,,
+SNACKS-LRG-,PHP-25,,,,,,,,,,,
+SNACK-MED:,PHP-20,,,,,,,,,,,
+SNAKC-SML :,PHP-15,,,,,,,,,,,
+COFFEE CUPS:,PHP-120,,,,,,,,,,,
+"PLASTIC
+CUPS:",PHP-120,,,,,,,,,,,
+,,,,,,,,,,,,
+VS1-:,PHP-250,,,,,,,,,,,
+99 PRO WW,PHP-250,,,,,,,,,,,
+"CABIN
+FILTER:",PHP-500,,,,,,,,,,,
+MXR-HORN,PHP-1800,,,,,,,,,,,
+BREAK CLNR,PHP-300,,,,,,,,,,,
+EXPENSES:,,,,,TOTAL:,,,NET:,,,,

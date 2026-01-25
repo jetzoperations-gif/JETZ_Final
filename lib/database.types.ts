@@ -9,6 +9,26 @@ export type Json =
 export interface Database {
     public: {
         Tables: {
+            profiles: {
+                Row: {
+                    id: string
+                    email: string | null
+                    role: 'admin' | 'staff'
+                    created_at: string
+                }
+                Insert: {
+                    id: string
+                    email?: string | null
+                    role?: 'admin' | 'staff'
+                    created_at?: string
+                }
+                Update: {
+                    id?: string
+                    email?: string | null
+                    role?: 'admin' | 'staff'
+                    created_at?: string
+                }
+            }
             tokens: {
                 Row: {
                     id: number
@@ -83,21 +103,21 @@ export interface Database {
                     name: string
                     price: number
                     stock_qty: number
-                    category: 'Drinks' | 'CarCare' | null
+                    category: 'Drinks' | 'Snacks' | 'CarCare' | null
                 }
                 Insert: {
                     id?: number
                     name: string
                     price: number
                     stock_qty?: number
-                    category?: 'Drinks' | 'CarCare' | null
+                    category?: 'Drinks' | 'Snacks' | 'CarCare' | null
                 }
                 Update: {
                     id?: number
                     name?: string
                     price?: number
                     stock_qty?: number
-                    category?: 'Drinks' | 'CarCare' | null
+                    category?: 'Drinks' | 'Snacks' | 'CarCare' | null
                 }
             }
             orders: {
