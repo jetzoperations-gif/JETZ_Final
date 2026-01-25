@@ -57,7 +57,7 @@ export default function TokenScanner({ onTokenVerified }: TokenScannerProps) {
     return (
         <div className="bg-white p-6 rounded-lg shadow-sm border text-center">
             <ScanLine size={48} className="mx-auto text-blue-500 mb-4" />
-            <h2 className="text-xl font-bold mb-4">Scan QR Token <span className="text-xs text-gray-300 font-normal">(v1.1)</span></h2>
+            <h2 className="text-xl font-bold mb-4">Scan QR Token <span className="text-xs text-gray-300 font-normal">(v1.2)</span></h2>
 
             <form onSubmit={handleVerify} className="max-w-xs mx-auto space-y-4">
                 <input
@@ -77,6 +77,11 @@ export default function TokenScanner({ onTokenVerified }: TokenScannerProps) {
                         <p className="text-xs mt-2 text-gray-500">
                             (If this says "JSON" or "Network", your Vercel Env Vars might be missing)
                         </p>
+                        <div className="mt-2 text-xs font-mono text-left border-t pt-2 border-red-200">
+                            <p>Config Check:</p>
+                            <p>URL: {process.env.NEXT_PUBLIC_SUPABASE_URL ? process.env.NEXT_PUBLIC_SUPABASE_URL.substring(0, 10) + '...' : 'MISSING'}</p>
+                            <p>Key: {process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ? process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY.substring(0, 5) + '...' : 'MISSING'}</p>
+                        </div>
                     </div>
                 )}
 
