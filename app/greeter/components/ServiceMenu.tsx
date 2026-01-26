@@ -31,7 +31,7 @@ export default function ServiceMenu({ vehicleTypeId, onSelect, onBack }: Service
                 <button onClick={onBack} className="text-sm font-semibold text-gray-500 hover:text-gray-800">
                     &larr; Change Vehicle
                 </button>
-                <h2 className="text-xl font-bold">Select Service</h2>
+                <h2 className="text-xl font-bold text-gray-900">Select Service</h2>
                 <div className="w-20"></div> {/* Spacer */}
             </div>
 
@@ -42,10 +42,10 @@ export default function ServiceMenu({ vehicleTypeId, onSelect, onBack }: Service
                         <button
                             key={service.id}
                             onClick={() => onSelect(service, price)}
-                            className="flex justify-between items-center p-4 bg-white border rounded-lg hover:bg-blue-50 hover:border-blue-300 shadow-sm text-left group"
+                            className="flex justify-between items-center p-4 bg-white border border-gray-300 rounded-lg hover:bg-blue-50 hover:border-blue-500 shadow-sm text-left group transition-all"
                         >
-                            <span className="font-medium group-hover:text-blue-700">{service.name}</span>
-                            <span className="font-bold text-green-600 bg-green-50 px-2 py-1 rounded">
+                            <span className="font-bold text-gray-900 text-lg group-hover:text-blue-800">{service.name}</span>
+                            <span className="font-bold text-green-700 bg-green-100 px-3 py-1 rounded-full text-sm">
                                 ₱{price}
                             </span>
                         </button>
