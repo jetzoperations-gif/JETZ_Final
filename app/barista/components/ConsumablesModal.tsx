@@ -92,6 +92,8 @@ export default function ConsumablesModal({ orderId, vehicleName, tokenId, onClos
         setLoading(false)
     }
 
+    const filteredItems = items.filter(i => i.category === activeTab)
+
     return (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in duration-200">
             <div className="bg-white w-full max-w-lg rounded-xl shadow-2xl flex flex-col max-h-[90vh]">
