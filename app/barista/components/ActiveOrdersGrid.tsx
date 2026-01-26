@@ -98,7 +98,7 @@ export default function ActiveOrdersGrid({ onSelectOrder, onNewItem }: ActiveOrd
                 'postgres_changes',
                 { event: 'INSERT', schema: 'public', table: 'order_items' },
                 (payload) => {
-                    // Keep this for redundancy just in case
+                    // payload.new has order_id. We should highlight that card.
                     const newOrderId = payload.new.order_id
                     setHighlightedOrders(prev => [...prev, newOrderId])
 
@@ -107,9 +107,12 @@ export default function ActiveOrdersGrid({ onSelectOrder, onNewItem }: ActiveOrd
                         [newOrderId]: (prev[newOrderId] || 0) + 1
                     }))
 
-                    // We don't have Token ID here easily without lookup.
-                    // But the UPDATE on orders usually fires right after anyway.
-                    // Let's rely on the UPDATE listener for the global alert to avoid double ding.
+                    // Trigger Parent Notification (Sound + Bell)
+                    // Lookup Token ID from existing state
+                    const existing = orders.find(o => o.id === newOrderId)
+                    const tokenNum = existing?.token_id || '?'
+
+                    if (onNewItem) onNewItem(newOrderId, tokenNum)
 
                     setTimeout(() => {
                         setHighlightedOrders(prev => prev.filter(id => id !== newOrderId))

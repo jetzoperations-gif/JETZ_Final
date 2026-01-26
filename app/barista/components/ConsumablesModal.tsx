@@ -27,6 +27,8 @@ export default function ConsumablesModal({ orderId, vehicleName, tokenId, onClos
 
     const [orderItems, setOrderItems] = useState<{ id: string, item_name: string, price_snapshot: number, quantity: number }[]>([])
 
+    const [serviceName, setServiceName] = useState('Loading...')
+
     // Fetch Inventory and Current Order Items
     useEffect(() => {
         // 1. Inventory
@@ -40,6 +42,26 @@ export default function ConsumablesModal({ orderId, vehicleName, tokenId, onClos
 
         // 2. Existing Order Items
         fetchOrderItems()
+
+        // 3. Fetch Service Name associated with this Order
+        const fetchService = async () => {
+            const { data } = await supabase
+                .from('orders')
+                .select(`
+                    service_id,
+                    services ( name )
+                `)
+                .eq('id', orderId)
+                .single()
+
+            if (data && data.services) {
+                // @ts-ignore
+                setServiceName(data.services.name)
+            } else {
+                setServiceName('No Service')
+            }
+        }
+        fetchService()
     }, [orderId])
 
     const fetchOrderItems = async () => {
@@ -102,7 +124,12 @@ export default function ConsumablesModal({ orderId, vehicleName, tokenId, onClos
                 <div className="p-4 border-b flex justify-between items-center bg-gray-50 rounded-t-xl">
                     <div>
                         <h2 className="text-xl font-bold text-gray-800">Manage Order</h2>
-                        <p className="text-sm text-gray-500">Token #{tokenId} • {vehicleName}</p>
+                        <div className="flex flex-col">
+                            <span className="text-sm text-gray-500 font-bold">Token #{tokenId} • {vehicleName}</span>
+                            <span className="text-xs text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full w-fit mt-1 font-semibold border border-blue-100">
+                                Package: {serviceName}
+                            </span>
+                        </div>
                     </div>
                     <button onClick={onClose} className="p-2 hover:bg-gray-200 rounded-full">
                         <X size={24} />
