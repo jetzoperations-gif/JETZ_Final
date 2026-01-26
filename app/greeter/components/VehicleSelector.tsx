@@ -9,9 +9,10 @@ type VehicleType = Database['public']['Tables']['vehicle_types']['Row']
 
 interface VehicleSelectorProps {
     onSelect: (vehicle: VehicleType) => void
+    onBack: () => void
 }
 
-export default function VehicleSelector({ onSelect }: VehicleSelectorProps) {
+export default function VehicleSelector({ onSelect, onBack }: VehicleSelectorProps) {
     const [types, setTypes] = useState<VehicleType[]>([])
 
     useEffect(() => {
@@ -28,7 +29,17 @@ export default function VehicleSelector({ onSelect }: VehicleSelectorProps) {
 
     return (
         <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <h2 className="text-xl font-bold text-center text-gray-900">Select Vehicle Type</h2>
+            <div className="flex items-center justify-between">
+                <button
+                    onClick={onBack}
+                    className="flex items-center text-gray-500 hover:text-gray-900 transition-colors"
+                >
+                    <span className="mr-1">←</span> Back
+                </button>
+                <h2 className="text-xl font-bold text-gray-900">Select Vehicle Type</h2>
+                <div className="w-16"></div> {/* Spacer for centering */}
+            </div>
+
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                 {types.map((type) => (
                     <button

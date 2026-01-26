@@ -23,8 +23,8 @@ export default function MainLayout({ children, title, role }: MainLayoutProps) {
                                 <h1 className="text-lg font-medium text-gray-900">{title}</h1>
                             </>
                         )}
-                        {/* Global Navigation to MiniBar (Tokens) */}
-                        <Link href="/barista" className="flex items-center gap-2 text-gray-400 hover:text-amber-600 transition-colors ml-4" title="Go to MiniBar (Tokens)">
+                        {/* Global Navigation to MiniCafe */}
+                        <Link href="/barista" className="flex items-center gap-2 text-gray-400 hover:text-amber-600 transition-colors ml-4" title="Go to MiniCafe">
                             <Coffee size={24} />
                         </Link>
                     </div>

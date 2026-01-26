@@ -7,6 +7,7 @@ import { Database } from '@/lib/database.types'
 import TokenScanner from './components/TokenScanner'
 import VehicleSelector from './components/VehicleSelector'
 import ServiceMenu from './components/ServiceMenu'
+import CustomerInputs from './components/CustomerInputs'
 import VerificationModal from './components/VerificationModal'
 import { CheckCircle } from 'lucide-react'
 
@@ -14,11 +15,13 @@ type VehicleType = Database['public']['Tables']['vehicle_types']['Row']
 type Service = Database['public']['Tables']['services']['Row']
 
 export default function GreeterPage() {
-    // State Machine: 'scan' -> 'vehicle' -> 'service' -> 'confirm' -> 'success'
-    const [step, setStep] = useState<'scan' | 'vehicle' | 'service' | 'confirm' | 'success'>('scan')
+    // State Machine: 'scan' -> 'customer' -> 'vehicle' -> 'service' -> 'confirm' -> 'success'
+    const [step, setStep] = useState<'scan' | 'customer' | 'vehicle' | 'service' | 'confirm' | 'success'>('scan')
 
     // Selection Data
     const [selectedToken, setSelectedToken] = useState<number | null>(null)
+    const [customerName, setCustomerName] = useState('')
+    const [plateNumber, setPlateNumber] = useState('')
     const [selectedVehicle, setSelectedVehicle] = useState<VehicleType | null>(null)
     const [selectedService, setSelectedService] = useState<Service | null>(null)
     const [currentPrice, setCurrentPrice] = useState(0)
@@ -28,6 +31,12 @@ export default function GreeterPage() {
     // Handlers
     const handleTokenVerified = (tokenId: number) => {
         setSelectedToken(tokenId)
+        setStep('customer')
+    }
+
+    const handleCustomerConfirm = (name: string, plate: string) => {
+        setCustomerName(name)
+        setPlateNumber(plate)
         setStep('vehicle')
     }
 
@@ -51,6 +60,8 @@ export default function GreeterPage() {
             .from('orders')
             .insert({
                 token_id: selectedToken,
+                customer_name: customerName,
+                plate_number: plateNumber || null,
                 vehicle_type_id: selectedVehicle.id,
                 service_id: selectedService.id,
                 total_amount: currentPrice,
@@ -92,6 +103,8 @@ export default function GreeterPage() {
         setTimeout(() => {
             setStep('scan')
             setSelectedToken(null)
+            setCustomerName('')
+            setPlateNumber('')
             setSelectedVehicle(null)
             setSelectedService(null)
         }, 2500)
@@ -99,6 +112,11 @@ export default function GreeterPage() {
 
     return (
         <MainLayout title="Greeter Station" role="staff">
+            <div className="absolute top-4 right-4 z-10">
+                <a href="/barista" className="bg-white/80 backdrop-blur text-blue-600 px-4 py-2 rounded-full text-sm font-bold shadow-sm hover:bg-white hover:shadow-md transition-all border border-blue-100 flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span> View Global Tokens
+                </a>
+            </div>
             <div className="max-w-md mx-auto relative min-h-[60vh]">
 
                 {/* Step 1: Scan Token */}
@@ -106,12 +124,23 @@ export default function GreeterPage() {
                     <TokenScanner onTokenVerified={handleTokenVerified} />
                 )}
 
-                {/* Step 2: Select Vehicle */}
-                {step === 'vehicle' && (
-                    <VehicleSelector onSelect={handleVehicleSelect} />
+                {/* Step 2: Customer Details */}
+                {step === 'customer' && (
+                    <CustomerInputs
+                        onConfirm={handleCustomerConfirm}
+                        onBack={() => setStep('scan')}
+                    />
                 )}
 
-                {/* Step 3: Select Service */}
+                {/* Step 3: Select Vehicle */}
+                {step === 'vehicle' && (
+                    <VehicleSelector
+                        onSelect={handleVehicleSelect}
+                        onBack={() => setStep('customer')}
+                    />
+                )}
+
+                {/* Step 4: Select Service */}
                 {step === 'service' && selectedVehicle && (
                     <ServiceMenu
                         vehicleTypeId={selectedVehicle.id}
@@ -120,20 +149,22 @@ export default function GreeterPage() {
                     />
                 )}
 
-                {/* Step 4: Confirm Modal */}
+                {/* Step 5: Confirm Modal */}
                 {step === 'confirm' && selectedToken && selectedVehicle && selectedService && (
                     <VerificationModal
                         token={selectedToken}
                         vehicle={selectedVehicle.name}
                         service={selectedService.name}
                         price={currentPrice}
+                        customerName={customerName}
+                        plateNumber={plateNumber}
                         loading={loading}
                         onConfirm={handleConfirm}
                         onCancel={() => setStep('service')}
                     />
                 )}
 
-                {/* Step 5: Success Message */}
+                {/* Step 6: Success Message */}
                 {step === 'success' && (
                     <div className="absolute inset-0 flex flex-col items-center justify-center bg-white rounded-lg animate-in zoom-in duration-300">
                         <CheckCircle size={80} className="text-green-500 mb-4" />
@@ -142,10 +173,11 @@ export default function GreeterPage() {
                     </div>
                 )}
 
-                {/* Progress Dots (Optional visualization) */}
+                {/* Progress Dots */}
                 {step !== 'success' && (
                     <div className="flex justify-center gap-2 mt-8 opacity-30">
                         <div className={`w-2 h-2 rounded-full ${step === 'scan' ? 'bg-blue-600' : 'bg-gray-400'}`} />
+                        <div className={`w-2 h-2 rounded-full ${step === 'customer' ? 'bg-blue-600' : 'bg-gray-400'}`} />
                         <div className={`w-2 h-2 rounded-full ${step === 'vehicle' ? 'bg-blue-600' : 'bg-gray-400'}`} />
                         <div className={`w-2 h-2 rounded-full ${step === 'service' ? 'bg-blue-600' : 'bg-gray-400'}`} />
                     </div>

@@ -3,7 +3,8 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 import { Database } from '@/lib/database.types'
-import { X, Plus, Coffee, Cookie } from 'lucide-react'
+import { X, Plus, Coffee, Cookie, FileText } from 'lucide-react'
+import TokenDetailsModal from '@/components/TokenDetailsModal'
 
 type InventoryItem = Database['public']['Tables']['inventory_items']['Row']
 
@@ -19,6 +20,7 @@ export default function ConsumablesModal({ orderId, vehicleName, tokenId, onClos
     const [activeTab, setActiveTab] = useState<'Drinks' | 'Snacks'>('Drinks')
     const [loading, setLoading] = useState(false)
     const [toast, setToast] = useState('')
+    const [showDetails, setShowDetails] = useState(false)
 
     const showToast = (msg: string) => {
         setToast(msg)
@@ -126,15 +128,31 @@ export default function ConsumablesModal({ orderId, vehicleName, tokenId, onClos
                         <h2 className="text-xl font-bold text-gray-800">Manage Order</h2>
                         <div className="flex flex-col">
                             <span className="text-sm text-gray-500 font-bold">Token #{tokenId} • {vehicleName}</span>
-                            <span className="text-xs text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full w-fit mt-1 font-semibold border border-blue-100">
-                                Package: {serviceName}
-                            </span>
+                            <div className="flex items-center gap-2 mt-1">
+                                <span className="text-xs text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full font-semibold border border-blue-100">
+                                    Package: {serviceName}
+                                </span>
+                                <button
+                                    onClick={() => setShowDetails(true)}
+                                    className="text-xs flex items-center gap-1 bg-white border border-gray-300 px-2 py-0.5 rounded shadow-sm hover:bg-gray-100 transition-colors"
+                                >
+                                    <FileText size={12} /> View Details
+                                </button>
+                            </div>
                         </div>
                     </div>
                     <button onClick={onClose} className="p-2 hover:bg-gray-200 rounded-full">
                         <X size={24} />
                     </button>
                 </div>
+
+                {/* Nested Details Modal */}
+                {showDetails && (
+                    <TokenDetailsModal
+                        orderId={orderId}
+                        onClose={() => setShowDetails(false)}
+                    />
+                )}
 
                 {/* Current Order List (New Section) */}
                 <div className="bg-blue-50 p-4 border-b max-h-40 overflow-y-auto">

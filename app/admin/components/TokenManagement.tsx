@@ -3,11 +3,15 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 import { Database } from '@/lib/database.types'
+import Link from 'next/link'
+import { Printer } from 'lucide-react'
 
 type Token = Database['public']['Tables']['tokens']['Row']
 
 export default function TokenManagement() {
     const [tokens, setTokens] = useState<Token[]>([])
+
+    const [generating, setGenerating] = useState(false)
 
     useEffect(() => {
         // Initial Fetch
@@ -35,10 +39,46 @@ export default function TokenManagement() {
         }
     }, [])
 
+    const handleGenerateTokens = async () => {
+        if (!confirm('This will ensure Tokens 1-50 exist. Continue?')) return
+        setGenerating(true)
+
+        const tokensToInsert = []
+        for (let i = 1; i <= 50; i++) {
+            // Check if exists first to avoid conflict errors if simple insert
+            // simpler approach: upsert
+            tokensToInsert.push({ id: i, status: 'available' })
+        }
+
+        const { error } = await supabase.from('tokens').upsert(tokensToInsert, { onConflict: 'id', ignoreDuplicates: true })
+
+        if (error) {
+            alert('Error generating tokens: ' + error.message)
+        } else {
+            alert('Tokens 1-50 ready!')
+        }
+        setGenerating(false)
+    }
+
     return (
         <div className="bg-white p-6 rounded-lg shadow">
             <div className="flex justify-between items-center mb-6">
-                <h2 className="text-xl font-bold text-gray-800">Live Token Status</h2>
+                <div className="flex items-center gap-4">
+                    <h2 className="text-xl font-bold text-gray-800">Live Token Status</h2>
+                    <button
+                        onClick={handleGenerateTokens}
+                        disabled={generating || tokens.length >= 50}
+                        className="text-xs bg-gray-100 hover:bg-gray-200 text-gray-600 px-3 py-1 rounded-full font-bold transition-colors disabled:opacity-50"
+                    >
+                        {generating ? 'Generating...' : tokens.length < 50 ? '+ Initialize Tokens' : 'Tokens Ready'}
+                    </button>
+                    <Link
+                        href="/admin/print-tokens"
+                        className="text-xs bg-blue-100 hover:bg-blue-200 text-blue-700 px-3 py-1 rounded-full font-bold transition-colors flex items-center gap-1"
+                    >
+                        <Printer size={12} /> Print Cards
+                    </Link>
+                </div>
                 <div className="flex gap-2">
                     <span className="flex items-center text-sm"><div className="w-3 h-3 bg-green-500 rounded-full mr-1"></div> Available</span>
                     <span className="flex items-center text-sm"><div className="w-3 h-3 bg-red-500 rounded-full mr-1"></div> Active</span>

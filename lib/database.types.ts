@@ -127,6 +127,7 @@ export interface Database {
                     vehicle_type_id: number | null
                     service_id: number | null
                     plate_number: string | null
+                    customer_name: string | null
                     washer_name: string | null
                     total_amount: number
                     status: 'pending_verification' | 'queued' | 'completed' | 'paid' | 'cancelled'
@@ -140,6 +141,7 @@ export interface Database {
                     vehicle_type_id?: number | null
                     service_id?: number | null
                     plate_number?: string | null
+                    customer_name?: string | null
                     washer_name?: string | null
                     total_amount?: number
                     status?: 'pending_verification' | 'queued' | 'completed' | 'paid' | 'cancelled'
@@ -153,6 +155,7 @@ export interface Database {
                     vehicle_type_id?: number | null
                     service_id?: number | null
                     plate_number?: string | null
+                    customer_name?: string | null
                     washer_name?: string | null
                     total_amount?: number
                     status?: 'pending_verification' | 'queued' | 'completed' | 'paid' | 'cancelled'

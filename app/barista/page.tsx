@@ -1,9 +1,11 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import Link from 'next/link'
 import MainLayout from '@/components/MainLayout'
 import ActiveOrdersGrid from './components/ActiveOrdersGrid'
 import ConsumablesModal from './components/ConsumablesModal'
+import TokenDetailsModal from '@/components/TokenDetailsModal'
 import { supabase } from '@/lib/supabase'
 import { Database } from '@/lib/database.types'
 
@@ -13,6 +15,7 @@ type Order = Database['public']['Tables']['orders']['Row'] & {
 
 export default function BaristaPage() {
     const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
+    const [viewingOrderId, setViewingOrderId] = useState<string | null>(null) // For direct token lookup
     const [notifications, setNotifications] = useState<{ id: string, orderId: string, time: Date, tokenId: string | number }[]>([])
     const [isNotifOpen, setIsNotifOpen] = useState(false)
     const [soundEnabled, setSoundEnabled] = useState(false)
@@ -113,64 +116,101 @@ export default function BaristaPage() {
         }
     }
 
+
+    const handleTokenSearch = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault()
+        const formData = new FormData(e.currentTarget)
+        const tokenVal = formData.get('tokenSearch') as string
+        if (!tokenVal) return
+
+        const { data, error } = await supabase
+            .from('orders')
+            .select('id')
+            .eq('token_id', tokenVal)
+            .eq('status', 'queued') // Only active jobs
+            .single()
+
+        if (data) {
+            setViewingOrderId(data.id)
+            e.currentTarget.reset()
+        } else {
+            alert(`No active job found for Token #${tokenVal}`)
+        }
+    }
+
     return (
-        <MainLayout title="MiniBar & Sales Log" role="staff">
+        <MainLayout title="MiniCafe Operations" role="staff">
             <div className="max-w-6xl mx-auto">
                 <div className="mb-6">
                     <div className="flex justify-between items-end">
                         <div>
                             <h2 className="text-2xl font-bold text-gray-800">Operations Board</h2>
-                            <p className="text-gray-500">Tap a job to log consumables.</p>
+                            <p className="text-gray-500">Tap a job to log consumables. <Link href="/menu" className="text-blue-600 hover:underline ml-2">View Menu</Link></p>
                         </div>
 
-                        {/* Notification Bell Area */}
-                        <div className="relative">
-                            <button
-                                onClick={() => setIsNotifOpen(!isNotifOpen)}
-                                className="bg-white p-3 rounded-full shadow-md border border-gray-200 hover:bg-gray-50 transition-colors relative"
-                            >
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-600"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9" /><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" /></svg>
+                        <div className="flex items-center gap-4">
+                            {/* Search Widget */}
+                            <form onSubmit={handleTokenSearch} className="relative">
+                                <input
+                                    name="tokenSearch"
+                                    type="number"
+                                    placeholder="Search Token #"
+                                    className="pl-4 pr-10 py-3 rounded-full border border-gray-200 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none w-48 transition-all focus:w-64"
+                                />
+                                <button type="submit" className="absolute right-2 top-1/2 -translate-y-1/2 bg-gray-100 p-1.5 rounded-full text-gray-400 hover:text-blue-600 hover:bg-blue-50">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" /></svg>
+                                </button>
+                            </form>
 
-                                {notifications.length > 0 && (
-                                    <div className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold w-6 h-6 flex items-center justify-center rounded-full animate-bounce">
-                                        {notifications.length}
+                            {/* Notification Bell Area */}
+                            <div className="relative">
+                                <button
+                                    onClick={() => setIsNotifOpen(!isNotifOpen)}
+                                    className="bg-white p-3 rounded-full shadow-md border border-gray-200 hover:bg-gray-50 transition-colors relative"
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-600"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9" /><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" /></svg>
+
+                                    {notifications.length > 0 && (
+                                        <div className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold w-6 h-6 flex items-center justify-center rounded-full animate-bounce">
+                                            {notifications.length}
+                                        </div>
+                                    )}
+                                </button>
+
+                                {/* Dropdown */}
+                                {isNotifOpen && (
+                                    <div className="absolute right-0 mt-2 w-80 bg-white rounded-xl shadow-2xl border border-gray-100 z-50 overflow-hidden animate-in fade-in slide-in-from-top-2">
+                                        <div className="p-3 bg-gray-50 border-b flex justify-between items-center">
+                                            <h3 className="font-bold text-gray-700">Notifications</h3>
+                                            <button onClick={() => setNotifications([])} className="text-xs text-blue-600 hover:underline">Clear All</button>
+                                        </div>
+                                        <div className="max-h-64 overflow-y-auto">
+                                            {notifications.length === 0 ? (
+                                                <div className="p-8 text-center text-gray-400 text-sm">
+                                                    No new alerts
+                                                </div>
+                                            ) : (
+                                                notifications.map(n => (
+                                                    <button
+                                                        key={n.id}
+                                                        onClick={() => handleNotificationClick(n)}
+                                                        className="w-full text-left p-3 border-b hover:bg-blue-50 transition-colors flex items-start gap-3 group"
+                                                    >
+                                                        <div className="bg-blue-100 text-blue-600 p-2 rounded-full mt-1">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" /><path d="M13.73 21a2 2 0 0 1-3.46 0" /></svg>
+                                                        </div>
+                                                        <div>
+                                                            <p className="font-bold text-gray-800 text-sm group-hover:text-blue-700">Token #{n.tokenId} - New Item</p>
+                                                            <p className="text-xs text-gray-500">Tap to view details</p>
+                                                            <p className="text-[10px] text-gray-400 mt-1">{n.time.toLocaleTimeString()}</p>
+                                                        </div>
+                                                    </button>
+                                                ))
+                                            )}
+                                        </div>
                                     </div>
                                 )}
-                            </button>
-
-                            {/* Dropdown */}
-                            {isNotifOpen && (
-                                <div className="absolute right-0 mt-2 w-80 bg-white rounded-xl shadow-2xl border border-gray-100 z-50 overflow-hidden animate-in fade-in slide-in-from-top-2">
-                                    <div className="p-3 bg-gray-50 border-b flex justify-between items-center">
-                                        <h3 className="font-bold text-gray-700">Notifications</h3>
-                                        <button onClick={() => setNotifications([])} className="text-xs text-blue-600 hover:underline">Clear All</button>
-                                    </div>
-                                    <div className="max-h-64 overflow-y-auto">
-                                        {notifications.length === 0 ? (
-                                            <div className="p-8 text-center text-gray-400 text-sm">
-                                                No new alerts
-                                            </div>
-                                        ) : (
-                                            notifications.map(n => (
-                                                <button
-                                                    key={n.id}
-                                                    onClick={() => handleNotificationClick(n)}
-                                                    className="w-full text-left p-3 border-b hover:bg-blue-50 transition-colors flex items-start gap-3 group"
-                                                >
-                                                    <div className="bg-blue-100 text-blue-600 p-2 rounded-full mt-1">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" /><path d="M13.73 21a2 2 0 0 1-3.46 0" /></svg>
-                                                    </div>
-                                                    <div>
-                                                        <p className="font-bold text-gray-800 text-sm group-hover:text-blue-700">Token #{n.tokenId} - New Item</p>
-                                                        <p className="text-xs text-gray-500">Tap to view details</p>
-                                                        <p className="text-[10px] text-gray-400 mt-1">{n.time.toLocaleTimeString()}</p>
-                                                    </div>
-                                                </button>
-                                            ))
-                                        )}
-                                    </div>
-                                </div>
-                            )}
+                            </div>
                         </div>
                     </div>
 
@@ -211,6 +251,13 @@ export default function BaristaPage() {
                         tokenId={selectedOrder.token_id || 0}
                         vehicleName={selectedOrder.vehicle_types?.name || 'Vehicle'}
                         onClose={() => setSelectedOrder(null)}
+                    />
+                )}
+
+                {viewingOrderId && (
+                    <TokenDetailsModal
+                        orderId={viewingOrderId}
+                        onClose={() => setViewingOrderId(null)}
                     />
                 )}
             </div>

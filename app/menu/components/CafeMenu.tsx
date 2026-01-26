@@ -290,7 +290,7 @@ export default function CafeMenu() {
                                     <ShoppingBag size={40} />
                                 </div>
                                 <h3 className="text-2xl font-bold text-gray-900 mb-2">Order Sent!</h3>
-                                <p className="text-gray-500">The barista will prepare your items shortly.</p>
+                                <p className="text-gray-500">The MiniCafe staff will prepare your items shortly.</p>
                             </div>
                         ) : (
                             <>

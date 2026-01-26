@@ -1,11 +1,12 @@
 import Link from 'next/link';
 import { Shield, User, Coffee, Banknote } from 'lucide-react';
+import ActiveTokensWidget from '@/components/ActiveTokensWidget';
 
 export default function Home() {
   const roles = [
     { name: 'Admin', href: '/admin', icon: Shield, color: 'bg-red-100 text-red-600' },
     { name: 'Greeter', href: '/greeter', icon: User, color: 'bg-blue-100 text-blue-600' },
-    { name: 'MiniBar', href: '/barista', icon: Coffee, color: 'bg-amber-100 text-amber-600' },
+    { name: 'MiniCafe', href: '/barista', icon: Coffee, color: 'bg-amber-100 text-amber-600' },
     { name: 'Cashier', href: '/cashier', icon: Banknote, color: 'bg-green-100 text-green-600' },
   ];
 
@@ -30,6 +31,9 @@ export default function Home() {
               <span className="font-semibold text-gray-700">{role.name}</span>
             </Link>
           ))}
+        </div>
+        <div className="mt-8 flex justify-center">
+          <ActiveTokensWidget />
         </div>
       </div>
     </div>
