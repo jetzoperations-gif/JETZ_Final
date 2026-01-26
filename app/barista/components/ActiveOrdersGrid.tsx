@@ -11,9 +11,10 @@ type Order = Database['public']['Tables']['orders']['Row'] & {
 
 interface ActiveOrdersGridProps {
     onSelectOrder: (order: Order) => void
+    onNewItem?: (orderId: string) => void
 }
 
-export default function ActiveOrdersGrid({ onSelectOrder }: ActiveOrdersGridProps) {
+export default function ActiveOrdersGrid({ onSelectOrder, onNewItem }: ActiveOrdersGridProps) {
     const [orders, setOrders] = useState<Order[]>([])
     const [loading, setLoading] = useState(true)
     const [highlightedOrders, setHighlightedOrders] = useState<string[]>([])
