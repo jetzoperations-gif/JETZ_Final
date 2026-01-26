@@ -16,6 +16,7 @@ interface ActiveOrdersGridProps {
 export default function ActiveOrdersGrid({ onSelectOrder }: ActiveOrdersGridProps) {
     const [orders, setOrders] = useState<Order[]>([])
     const [loading, setLoading] = useState(true)
+    const [highlightedOrders, setHighlightedOrders] = useState<string[]>([])
 
     const fetchOrders = async () => {
         // Fetch orders that are currently "in progress" (queued)
@@ -39,11 +40,27 @@ export default function ActiveOrdersGrid({ onSelectOrder }: ActiveOrdersGridProp
         // Realtime subscription to new orders or status changes
         const channel = supabase
             .channel('barista-orders')
+            // Listen for NEW ORDERS (Car Wash Jobs)
             .on(
                 'postgres_changes',
                 { event: '*', schema: 'public', table: 'orders' },
                 () => {
                     fetchOrders()
+                }
+            )
+            // Listen for NEW ITEMS (Digital Menu Orders)
+            .on(
+                'postgres_changes',
+                { event: 'INSERT', schema: 'public', table: 'order_items' },
+                (payload) => {
+                    // payload.new has order_id. We should highlight that card.
+                    const newOrderId = payload.new.order_id
+                    setHighlightedOrders(prev => [...prev, newOrderId])
+
+                    // Remove highlight after 10 seconds
+                    setTimeout(() => {
+                        setHighlightedOrders(prev => prev.filter(id => id !== newOrderId))
+                    }, 10000)
                 }
             )
             .subscribe()
@@ -88,6 +105,18 @@ export default function ActiveOrdersGrid({ onSelectOrder }: ActiveOrdersGridProp
                         <Clock size={12} className="mr-1" />
                         <span>{new Date(order.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                     </div>
+
+                    {/* Notification Badge Logic would go here - for now, simpler to just show visual cue if it was updated recently, 
+                        but effectively the Grid auto-updates, so the Barista just sees the Token appear or stay there. 
+                        To make it "Flash", we'd need to track "last updated". 
+                        For this iteration, let's add a "New Item" indicator if we catch an INSERT event for this order.
+                    */}
+                    {/* We can use local state to track "highlighted" orders from the subscription */}
+                    {highlightedOrders.includes(order.id) && (
+                        <div className="absolute top-2 right-2 animate-bounce bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full z-10 shadow-sm">
+                            New Item! ☕
+                        </div>
+                    )}
 
                     {order.washer_name && (
                         <p className="text-xs text-gray-400 mt-1">Washer: {order.washer_name}</p>
