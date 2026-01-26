@@ -59,12 +59,23 @@ export default function BaristaPage() {
         localStorage.setItem('barista_notifications', JSON.stringify(notifications))
     }, [notifications])
 
-    const handleNewNotification = (orderId: string) => {
+    const enableSound = () => {
+        const audio = new Audio(dingSound)
+        audio.play().then(() => {
+            setSoundEnabled(true)
+        }).catch(e => {
+            console.error("Enable sound failed", e)
+            alert(`Error: ${e.name} - ${e.message}\n\nPlease check Site Settings > Sound > Allow.`)
+        })
+    }
+
+    const handleNewNotification = (orderId: string, tokenId: string | number = 0) => {
         // Add to list
         setNotifications(prev => {
             const newVal = [{
                 id: Math.random().toString(),
                 orderId,
+                tokenId,
                 time: new Date()
             }, ...prev]
             return newVal
