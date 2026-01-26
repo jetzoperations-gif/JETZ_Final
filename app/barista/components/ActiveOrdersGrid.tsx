@@ -58,6 +58,9 @@ export default function ActiveOrdersGrid({ onSelectOrder, onNewItem }: ActiveOrd
                     const newOrderId = payload.new.order_id
                     setHighlightedOrders(prev => [...prev, newOrderId])
 
+                    // Trigger Parent Notification (Sound + Bell)
+                    if (onNewItem) onNewItem(newOrderId)
+
                     // Remove highlight after 10 seconds
                     setTimeout(() => {
                         setHighlightedOrders(prev => prev.filter(id => id !== newOrderId))
