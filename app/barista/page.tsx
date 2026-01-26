@@ -24,7 +24,7 @@ export default function BaristaPage() {
             setSoundEnabled(true)
         }).catch(e => {
             console.error("Enable sound failed", e)
-            alert("Could not enable sound. Check permissions.")
+            alert(`Error: ${e.name} - ${e.message}\n\nPlease check Site Settings > Sound > Allow.`)
         })
     }
 
