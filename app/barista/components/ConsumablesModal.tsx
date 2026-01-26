@@ -18,6 +18,12 @@ export default function ConsumablesModal({ orderId, vehicleName, tokenId, onClos
     const [items, setItems] = useState<InventoryItem[]>([])
     const [activeTab, setActiveTab] = useState<'Drinks' | 'Snacks'>('Drinks')
     const [loading, setLoading] = useState(false)
+    const [toast, setToast] = useState('')
+
+    const showToast = (msg: string) => {
+        setToast(msg)
+        setTimeout(() => setToast(''), 2000)
+    }
 
     // Fetch Inventory and Current Order Items
     useEffect(() => {
@@ -50,7 +56,7 @@ export default function ConsumablesModal({ orderId, vehicleName, tokenId, onClos
         if (error) {
             alert('Error adding item: ' + error.message)
         } else {
-            // Optional: Show a toast or small feedback
+            showToast(`Logged: ${item.name}`)
         }
         setLoading(false)
     }
@@ -115,6 +121,15 @@ export default function ConsumablesModal({ orderId, vehicleName, tokenId, onClos
                     <p className="text-xs text-gray-500">Tap an item to instantly log it to this job.</p>
                 </div>
             </div>
+
+            {/* Toast */}
+            {toast && (
+                <div className="absolute bottom-10 left-1/2 -translate-x-1/2 bg-slate-900 text-white px-6 py-2 rounded-full shadow-xl animate-in fade-in slide-in-from-bottom-5 z-50">
+                    <span className="font-bold text-sm flex items-center gap-2">
+                        ✅ {toast}
+                    </span>
+                </div>
+            )}
         </div>
     )
 }
