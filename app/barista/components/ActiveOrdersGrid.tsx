@@ -18,6 +18,7 @@ export default function ActiveOrdersGrid({ onSelectOrder, onNewItem }: ActiveOrd
     const [orders, setOrders] = useState<Order[]>([])
     const [loading, setLoading] = useState(true)
     const [highlightedOrders, setHighlightedOrders] = useState<string[]>([])
+    const [badges, setBadges] = useState<{ [orderId: string]: number }>({})
 
     const fetchOrders = async () => {
         // Fetch orders that are currently "in progress" (queued)
@@ -25,14 +26,24 @@ export default function ActiveOrdersGrid({ onSelectOrder, onNewItem }: ActiveOrd
         const { data, error } = await supabase
             .from('orders')
             .select(`
-        *,
-        vehicle_types ( name )
-      `)
+                *,
+                vehicle_types ( name )
+            `)
             .eq('status', 'queued')
             .order('created_at', { ascending: true })
 
         if (data) setOrders(data as any) // Type casting due to complex join
         setLoading(false)
+    }
+
+    // Handler to clear badge on select
+    const handleSelect = (order: Order) => {
+        setBadges(prev => {
+            const newBadges = { ...prev }
+            delete newBadges[order.id]
+            return newBadges
+        })
+        onSelectOrder(order)
     }
 
     useEffect(() => {
@@ -45,24 +56,36 @@ export default function ActiveOrdersGrid({ onSelectOrder, onNewItem }: ActiveOrd
             .on(
                 'postgres_changes',
                 { event: '*', schema: 'public', table: 'orders' },
-                () => {
-                    fetchOrders()
-                }
+                () => fetchOrders()
             )
             // Listen for ORDERS UPDATES (Triggered by Menu Order)
             .on(
                 'postgres_changes',
                 { event: 'UPDATE', schema: 'public', table: 'orders' },
-                (payload) => {
-                    // If an order updates, it might be a new item added.
-                    // We can just highlight it to be safe.
+                async (payload) => {
                     const updatedOrderId = payload.new.id
+                    // Get token_id directly from the payload (reliable)
+                    // If the payload has token_id, use it. If not, we might need to fetch it or finding in orders.
+                    // Usually UPDATE payload has the changed columns + ID.
+                    // To be safe we should check if token_id is in new. If not, find in existing state.
+                    let tokenNum = payload.new.token_id
+
+                    if (!tokenNum) {
+                        // Fallback to searching current state
+                        const existing = orders.find(o => o.id === updatedOrderId)
+                        tokenNum = existing?.token_id || '?'
+                    }
+
+                    // 1. Highlight Card
                     setHighlightedOrders(prev => [...prev, updatedOrderId])
 
-                    // Find the token ID for this order to make the notification useful
-                    const orderContext = orders.find(o => o.id === updatedOrderId)
-                    const tokenNum = orderContext?.token_id || '?'
+                    // 2. Increment Badge Count
+                    setBadges(prev => ({
+                        ...prev,
+                        [updatedOrderId]: (prev[updatedOrderId] || 0) + 1
+                    }))
 
+                    // 3. Trigger Global Notification
                     if (onNewItem) onNewItem(updatedOrderId, tokenNum)
 
                     setTimeout(() => {
@@ -75,14 +98,19 @@ export default function ActiveOrdersGrid({ onSelectOrder, onNewItem }: ActiveOrd
                 'postgres_changes',
                 { event: 'INSERT', schema: 'public', table: 'order_items' },
                 (payload) => {
-                    // payload.new has order_id. We should highlight that card.
+                    // Keep this for redundancy just in case
                     const newOrderId = payload.new.order_id
                     setHighlightedOrders(prev => [...prev, newOrderId])
 
-                    // Trigger Parent Notification (Sound + Bell)
-                    if (onNewItem) onNewItem(newOrderId)
+                    setBadges(prev => ({
+                        ...prev,
+                        [newOrderId]: (prev[newOrderId] || 0) + 1
+                    }))
 
-                    // Remove highlight after 10 seconds
+                    // We don't have Token ID here easily without lookup.
+                    // But the UPDATE on orders usually fires right after anyway.
+                    // Let's rely on the UPDATE listener for the global alert to avoid double ding.
+
                     setTimeout(() => {
                         setHighlightedOrders(prev => prev.filter(id => id !== newOrderId))
                     }, 10000)
@@ -93,7 +121,7 @@ export default function ActiveOrdersGrid({ onSelectOrder, onNewItem }: ActiveOrd
         return () => {
             supabase.removeChannel(channel)
         }
-    }, [])
+    }, [orders]) // Depend on orders to find token_id if needed, simplified with direct payload check
 
     if (loading) return <div className="text-center p-10 text-gray-500">Loading active jobs...</div>
 
@@ -111,7 +139,7 @@ export default function ActiveOrdersGrid({ onSelectOrder, onNewItem }: ActiveOrd
             {orders.map((order) => (
                 <button
                     key={order.id}
-                    onClick={() => onSelectOrder(order)}
+                    onClick={() => handleSelect(order)}
                     className="relative flex flex-col items-start p-5 bg-white border border-gray-200 rounded-xl hover:shadow-lg hover:border-blue-400 transition-all text-left group"
                 >
                     <div className="absolute top-0 right-0 bg-blue-600 text-white text-xs font-bold px-2 py-1 rounded-bl-lg rounded-tr-lg">
@@ -131,16 +159,16 @@ export default function ActiveOrdersGrid({ onSelectOrder, onNewItem }: ActiveOrd
                         <span>{new Date(order.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                     </div>
 
-                    {/* Notification Badge Logic would go here - for now, simpler to just show visual cue if it was updated recently, 
-                        but effectively the Grid auto-updates, so the Barista just sees the Token appear or stay there. 
-                        To make it "Flash", we'd need to track "last updated". 
-                        For this iteration, let's add a "New Item" indicator if we catch an INSERT event for this order.
-                    */}
-                    {/* We can use local state to track "highlighted" orders from the subscription */}
-                    {highlightedOrders.includes(order.id) && (
-                        <div className="absolute top-2 right-2 animate-bounce bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full z-10 shadow-sm">
-                            New Item! ☕
+                    {/* RED NOTIFICATION BADGE on the Card */}
+                    {badges[order.id] > 0 && (
+                        <div className="absolute top-2 right-2 animate-bounce bg-red-600 text-white text-[10px] font-bold w-6 h-6 flex items-center justify-center rounded-full z-10 shadow-md border-2 border-white">
+                            {badges[order.id]}
                         </div>
+                    )}
+
+                    {/* Bounce Effect for "Just Updated" */}
+                    {highlightedOrders.includes(order.id) && (
+                        <div className="absolute inset-0 border-2 border-blue-400 rounded-xl animate-pulse pointer-events-none"></div>
                     )}
 
                     {order.washer_name && (
