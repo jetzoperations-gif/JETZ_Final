@@ -4,6 +4,7 @@ import { useState } from 'react'
 import MainLayout from '@/components/MainLayout'
 import ActiveOrdersGrid from './components/ActiveOrdersGrid'
 import ConsumablesModal from './components/ConsumablesModal'
+import { supabase } from '@/lib/supabase'
 import { Database } from '@/lib/database.types'
 
 type Order = Database['public']['Tables']['orders']['Row'] & {
@@ -12,10 +13,11 @@ type Order = Database['public']['Tables']['orders']['Row'] & {
 
 export default function BaristaPage() {
     const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
-    const [notifications, setNotifications] = useState<string[]>([])
+    const [notifications, setNotifications] = useState<{ id: string, orderId: string, time: Date }[]>([])
+    const [isNotifOpen, setIsNotifOpen] = useState(false)
     const [soundEnabled, setSoundEnabled] = useState(false)
 
-    // Valid external URL (The Base64 string was corrupted)
+    // Valid external URL
     const dingSound = 'https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3'
 
     const enableSound = () => {
@@ -28,12 +30,43 @@ export default function BaristaPage() {
         })
     }
 
-    const handleNewNotification = (msg: string) => {
-        setNotifications(prev => [msg, ...prev])
+    const handleNewNotification = (orderId: string) => {
+        // Add to list
+        setNotifications(prev => [{
+            id: Math.random().toString(),
+            orderId,
+            time: new Date()
+        }, ...prev])
 
+        // Play Sound
         if (soundEnabled) {
             const audio = new Audio(dingSound)
             audio.play().catch(e => console.log('Audio play failed', e))
+        }
+    }
+
+    const handleNotificationClick = async (notif: { id: string, orderId: string }) => {
+        // 1. Fetch the fresh order details
+        const { data, error } = await supabase
+            .from('orders')
+            .select(`
+                *,
+                vehicle_types ( name )
+            `)
+            .eq('id', notif.orderId)
+            .single()
+
+        if (data) {
+            // 2. Open Modal
+            // @ts-ignore
+            setSelectedOrder(data)
+
+            // 3. Remove from list (Mark as read)
+            setNotifications(prev => prev.filter(n => n.id !== notif.id))
+            setIsNotifOpen(false)
+        } else {
+            alert('Order not found or completed.')
+            setNotifications(prev => prev.filter(n => n.id !== notif.id))
         }
     }
 
@@ -47,14 +80,52 @@ export default function BaristaPage() {
                             <p className="text-gray-500">Tap a job to log consumables.</p>
                         </div>
 
-                        {/* Notification Bell */}
+                        {/* Notification Bell Area */}
                         <div className="relative">
-                            <div className="bg-white p-3 rounded-full shadow-sm border border-gray-200">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-600"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" /><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" /></svg>
-                            </div>
-                            {notifications.length > 0 && (
-                                <div className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold w-6 h-6 flex items-center justify-center rounded-full animate-bounce">
-                                    {notifications.length}
+                            <button
+                                onClick={() => setIsNotifOpen(!isNotifOpen)}
+                                className="bg-white p-3 rounded-full shadow-md border border-gray-200 hover:bg-gray-50 transition-colors relative"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-600"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9" /><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" /></svg>
+
+                                {notifications.length > 0 && (
+                                    <div className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold w-6 h-6 flex items-center justify-center rounded-full animate-bounce">
+                                        {notifications.length}
+                                    </div>
+                                )}
+                            </button>
+
+                            {/* Dropdown */}
+                            {isNotifOpen && (
+                                <div className="absolute right-0 mt-2 w-80 bg-white rounded-xl shadow-2xl border border-gray-100 z-50 overflow-hidden animate-in fade-in slide-in-from-top-2">
+                                    <div className="p-3 bg-gray-50 border-b flex justify-between items-center">
+                                        <h3 className="font-bold text-gray-700">Notifications</h3>
+                                        <button onClick={() => setNotifications([])} className="text-xs text-blue-600 hover:underline">Clear All</button>
+                                    </div>
+                                    <div className="max-h-64 overflow-y-auto">
+                                        {notifications.length === 0 ? (
+                                            <div className="p-8 text-center text-gray-400 text-sm">
+                                                No new alerts
+                                            </div>
+                                        ) : (
+                                            notifications.map(n => (
+                                                <button
+                                                    key={n.id}
+                                                    onClick={() => handleNotificationClick(n)}
+                                                    className="w-full text-left p-3 border-b hover:bg-blue-50 transition-colors flex items-start gap-3 group"
+                                                >
+                                                    <div className="bg-blue-100 text-blue-600 p-2 rounded-full mt-1">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" /><path d="M13.73 21a2 2 0 0 1-3.46 0" /></svg>
+                                                    </div>
+                                                    <div>
+                                                        <p className="font-bold text-gray-800 text-sm group-hover:text-blue-700">New Menu Order</p>
+                                                        <p className="text-xs text-gray-500">Tap to view details</p>
+                                                        <p className="text-[10px] text-gray-400 mt-1">{n.time.toLocaleTimeString()}</p>
+                                                    </div>
+                                                </button>
+                                            ))
+                                        )}
+                                    </div>
                                 </div>
                             )}
                         </div>
