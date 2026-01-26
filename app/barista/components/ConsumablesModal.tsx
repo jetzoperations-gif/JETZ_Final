@@ -25,8 +25,11 @@ export default function ConsumablesModal({ orderId, vehicleName, tokenId, onClos
         setTimeout(() => setToast(''), 2000)
     }
 
+    const [orderItems, setOrderItems] = useState<{ id: string, item_name: string, price_snapshot: number, quantity: number }[]>([])
+
     // Fetch Inventory and Current Order Items
     useEffect(() => {
+        // 1. Inventory
         supabase
             .from('inventory_items')
             .select('*')
@@ -34,9 +37,36 @@ export default function ConsumablesModal({ orderId, vehicleName, tokenId, onClos
             .then(({ data }) => {
                 if (data) setItems(data)
             })
-    }, [])
 
-    const filteredItems = items.filter(i => i.category === activeTab)
+        // 2. Existing Order Items
+        fetchOrderItems()
+    }, [orderId])
+
+    const fetchOrderItems = async () => {
+        const { data } = await supabase
+            .from('order_items')
+            .select('*')
+            .eq('order_id', orderId)
+            .order('item_name')
+
+        if (data) setOrderItems(data)
+    }
+
+    const handleRemoveItem = async (itemId: string, itemName: string) => {
+        if (!confirm(`Remove ${itemName} from this order?`)) return
+
+        const { error } = await supabase
+            .from('order_items')
+            .delete()
+            .eq('id', itemId)
+
+        if (error) {
+            alert('Error removing item')
+        } else {
+            showToast(`Removed: ${itemName}`)
+            fetchOrderItems() // Refresh list
+        }
+    }
 
     const handleAddItem = async (item: InventoryItem) => {
         setLoading(true)
@@ -57,23 +87,49 @@ export default function ConsumablesModal({ orderId, vehicleName, tokenId, onClos
             alert('Error adding item: ' + error.message)
         } else {
             showToast(`Logged: ${item.name}`)
+            fetchOrderItems() // Refresh list to show new item
         }
         setLoading(false)
     }
 
     return (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in duration-200">
-            <div className="bg-white w-full max-w-lg rounded-xl shadow-2xl flex flex-col max-h-[85vh]">
+            <div className="bg-white w-full max-w-lg rounded-xl shadow-2xl flex flex-col max-h-[90vh]">
 
                 {/* Header */}
                 <div className="p-4 border-b flex justify-between items-center bg-gray-50 rounded-t-xl">
                     <div>
-                        <h2 className="text-xl font-bold text-gray-800">Log Consumables</h2>
+                        <h2 className="text-xl font-bold text-gray-800">Manage Order</h2>
                         <p className="text-sm text-gray-500">Token #{tokenId} • {vehicleName}</p>
                     </div>
                     <button onClick={onClose} className="p-2 hover:bg-gray-200 rounded-full">
                         <X size={24} />
                     </button>
+                </div>
+
+                {/* Current Order List (New Section) */}
+                <div className="bg-blue-50 p-4 border-b max-h-40 overflow-y-auto">
+                    <h3 className="text-xs font-bold text-blue-800 uppercase mb-2">Current Consumables</h3>
+                    {orderItems.length === 0 ? (
+                        <p className="text-sm text-gray-500 italic">No items logged yet.</p>
+                    ) : (
+                        <div className="space-y-2">
+                            {orderItems.map(oi => (
+                                <div key={oi.id} className="flex justify-between items-center bg-white p-2 rounded shadow-sm">
+                                    <span className="text-sm font-medium text-gray-800">{oi.item_name}</span>
+                                    <div className="flex items-center gap-3">
+                                        <span className="text-xs font-bold text-gray-500">₱{oi.price_snapshot}</span>
+                                        <button
+                                            onClick={() => handleRemoveItem(oi.id, oi.item_name)}
+                                            className="text-red-500 hover:text-red-700 text-xs font-bold hover:underline"
+                                        >
+                                            Remove
+                                        </button>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
                 </div>
 
                 {/* Tabs */}
@@ -96,7 +152,7 @@ export default function ConsumablesModal({ orderId, vehicleName, tokenId, onClos
                     </button>
                 </div>
 
-                {/* Item Grid */}
+                {/* Item Grid (Add New) */}
                 <div className="flex-1 overflow-y-auto p-4">
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                         {filteredItems.map((item) => (
@@ -104,12 +160,14 @@ export default function ConsumablesModal({ orderId, vehicleName, tokenId, onClos
                                 key={item.id}
                                 disabled={loading}
                                 onClick={() => handleAddItem(item)}
-                                className="flex flex-col items-center p-4 border rounded-xl hover:border-blue-400 hover:bg-blue-50 transition-all active:scale-95 disabled:opacity-50"
+                                className="flex flex-col items-center p-4 border rounded-xl hover:border-blue-400 hover:bg-blue-50 transition-all active:scale-95 disabled:opacity-50 h-full justify-between"
                             >
-                                <span className="font-bold text-gray-800 text-center mb-1">{item.name}</span>
-                                <span className="text-sm text-green-600 bg-green-50 px-2 py-0.5 rounded-full font-medium">₱{item.price}</span>
-                                <div className="mt-3 p-1 bg-blue-100 text-blue-600 rounded-full">
-                                    <Plus size={16} />
+                                <span className="font-bold text-gray-800 text-center mb-1 text-sm">{item.name}</span>
+                                <div className="flex flex-col items-center gap-2 w-full">
+                                    <span className="text-xs text-green-600 bg-green-50 px-2 py-0.5 rounded-full font-medium">₱{item.price}</span>
+                                    <div className="p-1 bg-blue-100 text-blue-600 rounded-full w-full flex justify-center">
+                                        <Plus size={16} />
+                                    </div>
                                 </div>
                             </button>
                         ))}

@@ -199,12 +199,34 @@ export default function CafeMenu() {
                         </div>
                         <div className="flex items-center justify-between mt-3">
                             <span className="font-bold text-lg text-blue-700">₱{item.price}</span>
-                            <button
-                                onClick={() => addToCart(item)}
-                                className="bg-blue-50 text-blue-600 p-2 rounded-full hover:bg-blue-600 hover:text-white transition-colors"
-                            >
-                                <Plus size={20} />
-                            </button>
+
+                            {/* Quantity Controls */}
+                            {cart.find(c => c.id === item.id) ? (
+                                <div className="flex items-center gap-2 bg-blue-50 rounded-full p-1">
+                                    <button
+                                        onClick={() => removeFromCart(item.id)}
+                                        className="w-8 h-8 flex items-center justify-center rounded-full bg-white text-blue-600 shadow-sm border border-blue-100 hover:bg-blue-100"
+                                    >
+                                        <Minus size={14} />
+                                    </button>
+                                    <span className="font-bold text-blue-900 text-sm w-4 text-center">
+                                        {cart.find(c => c.id === item.id)?.quantity || 0}
+                                    </span>
+                                    <button
+                                        onClick={() => addToCart(item)}
+                                        className="w-8 h-8 flex items-center justify-center rounded-full bg-blue-600 text-white shadow-sm hover:bg-blue-700"
+                                    >
+                                        <Plus size={14} />
+                                    </button>
+                                </div>
+                            ) : (
+                                <button
+                                    onClick={() => addToCart(item)}
+                                    className="bg-blue-50 text-blue-600 p-2 rounded-full hover:bg-blue-600 hover:text-white transition-colors"
+                                >
+                                    <Plus size={20} />
+                                </button>
+                            )}
                         </div>
                     </div>
                 ))}
