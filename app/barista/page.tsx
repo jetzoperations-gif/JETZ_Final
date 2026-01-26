@@ -27,6 +27,12 @@ export default function BaristaPage() {
                     <div>
                         <h2 className="text-2xl font-bold text-gray-800">Operations Board</h2>
                         <p className="text-gray-500">Tap a job to log consumables.</p>
+                        <button
+                            onClick={() => handleNewNotification('Test Notification')}
+                            className="mt-2 text-xs bg-gray-200 hover:bg-gray-300 px-2 py-1 rounded text-gray-700"
+                        >
+                            Test Sound 🔔
+                        </button>
                     </div>
 
                     {/* Notification Bell */}
