@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import MainLayout from '@/components/MainLayout'
 import ActiveOrdersGrid from './components/ActiveOrdersGrid'
 import ConsumablesModal from './components/ConsumablesModal'
@@ -30,13 +30,38 @@ export default function BaristaPage() {
         })
     }
 
+    // Load form local storage on mount
+    useEffect(() => {
+        const saved = localStorage.getItem('barista_notifications')
+        if (saved) {
+            try {
+                // Parse dates back to Date objects
+                const parsed = JSON.parse(saved).map((n: any) => ({
+                    ...n,
+                    time: new Date(n.time)
+                }))
+                setNotifications(parsed)
+            } catch (e) {
+                console.error('Failed to parse notifications', e)
+            }
+        }
+    }, [])
+
+    // Save to local storage whenever changed
+    useEffect(() => {
+        localStorage.setItem('barista_notifications', JSON.stringify(notifications))
+    }, [notifications])
+
     const handleNewNotification = (orderId: string) => {
         // Add to list
-        setNotifications(prev => [{
-            id: Math.random().toString(),
-            orderId,
-            time: new Date()
-        }, ...prev])
+        setNotifications(prev => {
+            const newVal = [{
+                id: Math.random().toString(),
+                orderId,
+                time: new Date()
+            }, ...prev]
+            return newVal
+        })
 
         // Play Sound
         if (soundEnabled) {
