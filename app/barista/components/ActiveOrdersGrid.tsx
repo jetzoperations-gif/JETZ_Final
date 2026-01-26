@@ -49,6 +49,23 @@ export default function ActiveOrdersGrid({ onSelectOrder, onNewItem }: ActiveOrd
                     fetchOrders()
                 }
             )
+            // Listen for ORDERS UPDATES (Triggered by Menu Order)
+            .on(
+                'postgres_changes',
+                { event: 'UPDATE', schema: 'public', table: 'orders' },
+                (payload) => {
+                    // If an order updates, it might be a new item added.
+                    // We can just highlight it to be safe.
+                    const updatedOrderId = payload.new.id
+                    setHighlightedOrders(prev => [...prev, updatedOrderId])
+
+                    if (onNewItem) onNewItem(updatedOrderId)
+
+                    setTimeout(() => {
+                        setHighlightedOrders(prev => prev.filter(id => id !== updatedOrderId))
+                    }, 10000)
+                }
+            )
             // Listen for NEW ITEMS (Digital Menu Orders)
             .on(
                 'postgres_changes',

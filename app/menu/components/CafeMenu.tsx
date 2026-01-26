@@ -148,6 +148,13 @@ export default function CafeMenu() {
             console.error(insertError)
             alert('Failed to place order. Try again.')
         } else {
+            // FORCE UPDATE THE ORDER to trigger Realtime on 'orders' table
+            // This ensures Barista gets notified even if 'order_items' replication is off
+            await supabase
+                .from('orders')
+                .update({ total_amount: 0 }) // Dummy update or legit update if we tracked total
+                .eq('id', orderId)
+
             setOrderSuccess(true)
             setCart([])
             setTokenInput('')
