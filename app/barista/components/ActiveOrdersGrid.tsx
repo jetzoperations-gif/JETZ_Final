@@ -11,7 +11,7 @@ type Order = Database['public']['Tables']['orders']['Row'] & {
 
 interface ActiveOrdersGridProps {
     onSelectOrder: (order: Order) => void
-    onNewItem?: (orderId: string) => void
+    onNewItem?: (orderId: string, tokenId: string | number) => void
 }
 
 export default function ActiveOrdersGrid({ onSelectOrder, onNewItem }: ActiveOrdersGridProps) {
@@ -59,7 +59,11 @@ export default function ActiveOrdersGrid({ onSelectOrder, onNewItem }: ActiveOrd
                     const updatedOrderId = payload.new.id
                     setHighlightedOrders(prev => [...prev, updatedOrderId])
 
-                    if (onNewItem) onNewItem(updatedOrderId)
+                    // Find the token ID for this order to make the notification useful
+                    const orderContext = orders.find(o => o.id === updatedOrderId)
+                    const tokenNum = orderContext?.token_id || '?'
+
+                    if (onNewItem) onNewItem(updatedOrderId, tokenNum)
 
                     setTimeout(() => {
                         setHighlightedOrders(prev => prev.filter(id => id !== updatedOrderId))
