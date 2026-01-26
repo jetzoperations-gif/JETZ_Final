@@ -114,7 +114,7 @@ export default function BaristaPage() {
     }
 
     return (
-        <MainLayout title="Cafe & Sales Log" role="staff">
+        <MainLayout title="MiniBar & Sales Log" role="staff">
             <div className="max-w-6xl mx-auto">
                 <div className="mb-6">
                     <div className="flex justify-between items-end">

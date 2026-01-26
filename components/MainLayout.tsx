@@ -1,5 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
+import { Coffee } from 'lucide-react';
 
 interface MainLayoutProps {
     children: React.ReactNode;
@@ -22,6 +23,10 @@ export default function MainLayout({ children, title, role }: MainLayoutProps) {
                                 <h1 className="text-lg font-medium text-gray-900">{title}</h1>
                             </>
                         )}
+                        {/* Global Navigation to MiniBar (Tokens) */}
+                        <Link href="/barista" className="flex items-center gap-2 text-gray-400 hover:text-amber-600 transition-colors ml-4" title="Go to MiniBar (Tokens)">
+                            <Coffee size={24} />
+                        </Link>
                     </div>
                     <div className="flex items-center gap-4">
                         {/* Placeholder for user info or logout */}
