@@ -13,7 +13,6 @@ interface VerificationModalProps {
 }
 
 export default function VerificationModal({
-    token, vehicle, service, price, loading, onConfirm, onCancel
     token: tokenId, vehicle: vehicleName, service: serviceName, price, loading, onConfirm, onCancel
 }: VerificationModalProps) {
     return (
