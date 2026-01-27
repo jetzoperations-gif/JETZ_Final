@@ -134,7 +134,7 @@ export default function ConsumablesModal({ orderId, vehicleName, tokenId, onClos
                                 </span>
                                 <button
                                     onClick={() => setShowDetails(true)}
-                                    className="text-xs flex items-center gap-1 bg-white border border-gray-300 px-2 py-0.5 rounded shadow-sm hover:bg-gray-100 transition-colors"
+                                    className="text-xs flex items-center gap-1 bg-white border border-gray-300 px-2 py-0.5 rounded shadow-sm hover:bg-gray-100 transition-colors text-gray-700 font-bold"
                                 >
                                     <FileText size={12} /> View Details
                                 </button>
