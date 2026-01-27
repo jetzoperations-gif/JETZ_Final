@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
@@ -21,21 +21,8 @@ export default function BaristaPage() {
     const [soundEnabled, setSoundEnabled] = useState(false)
 
     // Reliable Base64 Beep (avoids Network/CORS issues)
-    const dingSound = 'data:audio/mp3;base64,SUQzBAAAAAAAI1RTSVMAAAAPAAADTGF2ZjU4LjI5LjEwMAAAAAAAAAAAAAAA//OEAAAAAAAAAAAAAAAAAAAAAAAASW5mbwAAAA8AAAAEAAABIwAAERERERERERERZmZmZmZmZmZmqqqqqqqqqqqq//////////////////////////////////OEAAAAAAAAAAAAAAAAAAAAAAAATGF2YzU4LjU0LjEwMAAAAAAAAAAAAAAA//OEAAAAAAAAAAAAAAAAAAAAAAA//OEAAAAAAAAAAAAAAAAAAAAAAA//OEAAAAAAAAAAAAAAAAAAAAAAA//OEAAAAAAAAAAAAAAAAAAAAAAA//OEAAAAAAAAAAAAAAAAAAAAAAA//OEAAAAAAAAAAAAAAAAAAAAAAA//OEAAAAAAAAAAAAAAAAAAAAAAA//OEAAAAAAAAAAAAAAAAAAAAAAA//OEAAAAAAAAAAAAAAAAAAAAAAA//OEAAAAAAAAAAAAAAAAAAAAAAA//OEAAAAAAAAAAAAAAAAAAAAAAA//OEAAAAAAAAAAAAAAAAAAAAAAA//OEAAAAAAAAAAAAAAAAAAAAAAA//OEAAAAAAAAAAAAAAAAAAAAAAA//OEAAAAAAAAAAAAAAAAAAAAAAA//OEAAAAAAAAAAAAAAAAAAAAAAA//OEAAAAAAAAAAAAAAAAAAAAAAA//OEAAAAAAAAAAAAAAAAAAAAAAA//OEAAAAAAAAAAAAAAAAAAAAAAA//OEAAAAAAAAAAAAAAAAAAAAAAA//OEAAAAAAAAAAAAAAAAAAAAAAA//OEAAAAAAAAAAAAAAAAAAAAAAA//OEAAAAAAAAAAAAAAAAAAAAAAA//OEAAAAAAAAAAAAAAAAAAAAAAA//OEAAAAAAAAAAAAAAAAAAAAAAA//OEAAAAAAAAAAAAAAAAAAAAAAA//OEAAAAAAAAAAAAAAAAAAAAAAA//OEAAAAAAAAAAAAAAAAAAAAAAA//OEAAAAAAAAAAAAAAAAAAAAAAA' // Shortened for brevity, use a real short beep or a simpler one.
-    // Actually, I will use a simple sine wave or a known short beep to limit artifact size.
-    // Let's use a standard "Glass" sound equivalent or similar.
-    // Since I can't generate a massive base64 string efficiently here without it being huge, 
-    // I will try to use a standard browser API or a very short, confirmed working URL, 
-    // OR just use a shorter Base64 of a simple 'pop' sound.
-    // Let's revert to a very stable URL first, or enable the "Test Sound" to debug.
-
-    // Better Plan: Use a trusted CDN for a simple 'pop.mp3' or similar.
-    // Or, stick to the request: "Still no sound". 
-    // I'll try a different, very common sound URL that is less likely to be blocked.
-    // "https://files.freemusicarchive.org/storage-freemusicarchive-org/music/no_curator/Tours/Enthusiast/Tours_-_01_-_Enthusiast.mp3" is too long.
-    // Let's us a simple beep from a reliable source.
-    // https://actions.google.com/sounds/v1/alarms/beep_short.ogg
-    const dingSound = 'https://actions.google.com/sounds/v1/alarms/beep_short.ogg'
+    // Use a simple beep from a reliable source.
+    const dingSound = 'https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3'
 
     // Auto-attempt to enable sound on mount (Checks if user has "Allowed" site settings)
     useEffect(() => {
@@ -244,7 +231,7 @@ export default function BaristaPage() {
                     {!soundEnabled && (
                         <div className="mt-4 bg-orange-100 border border-orange-200 text-orange-800 p-3 rounded-lg flex items-center justify-between">
                             <span className="text-sm font-semibold flex items-center gap-2">
-                                🔔 Audio alerts are muted.
+                                ðŸ”” Audio alerts are muted.
                             </span>
                             <button
                                 onClick={enableSound}
@@ -261,7 +248,7 @@ export default function BaristaPage() {
                             onClick={() => handleNewNotification('Test Notification')}
                             className="mt-2 text-xs bg-gray-200 hover:bg-gray-300 px-3 py-1 rounded-full text-gray-700 font-medium"
                         >
-                            Test Sound 🔊
+                            Test Sound ðŸ”Š
                         </button>
                     )}
                 </div>

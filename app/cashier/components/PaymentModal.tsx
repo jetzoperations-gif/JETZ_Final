@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 import { Database } from '@/lib/database.types'
-import { Loader2, Receipt, CheckCircle, X } from 'lucide-react'
+import { Loader2, ReceiptText, CheckCircle, X, Banknote } from 'lucide-react'
 
 type OrderItem = Database['public']['Tables']['order_items']['Row']
 
@@ -75,7 +75,7 @@ export default function PaymentModal({ orderId, vehicleName, tokenId, onClose, o
                     <button onClick={onClose} className="absolute top-4 right-4 text-blue-200 hover:text-white">
                         <X size={24} />
                     </button>
-                    <Receipt size={48} className="mx-auto mb-2 opacity-80" />
+                    <ReceiptText size={48} className="mx-auto mb-2 opacity-80" />
                     <h2 className="text-2xl font-bold">Job Summary</h2>
                     <p className="opacity-90">Token #{tokenId} • {vehicleName}</p>
                 </div>
