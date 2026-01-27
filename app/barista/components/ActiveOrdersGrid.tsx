@@ -64,17 +64,7 @@ export default function ActiveOrdersGrid({ onSelectOrder, onNewItem }: ActiveOrd
                 { event: 'UPDATE', schema: 'public', table: 'orders' },
                 async (payload) => {
                     const updatedOrderId = payload.new.id
-                    // Get token_id directly from the payload (reliable)
-                    // If the payload has token_id, use it. If not, we might need to fetch it or finding in orders.
-                    // Usually UPDATE payload has the changed columns + ID.
-                    // To be safe we should check if token_id is in new. If not, find in existing state.
                     let tokenNum = payload.new.token_id
-
-                    if (!tokenNum) {
-                        // Fallback to searching current state
-                        const existing = orders.find(o => o.id === updatedOrderId)
-                        tokenNum = existing?.token_id || '?'
-                    }
 
                     // 1. Highlight Card
                     setHighlightedOrders(prev => [...prev, updatedOrderId])
@@ -86,7 +76,13 @@ export default function ActiveOrdersGrid({ onSelectOrder, onNewItem }: ActiveOrd
                     }))
 
                     // 3. Trigger Global Notification
-                    if (onNewItem) onNewItem(updatedOrderId, tokenNum)
+                    // Fetch token if missing (though usually in payload)
+                    if (!tokenNum) {
+                        const { data } = await supabase.from('orders').select('token_id').eq('id', updatedOrderId).single()
+                        if (data) tokenNum = data.token_id
+                    }
+
+                    if (onNewItem && tokenNum) onNewItem(updatedOrderId, tokenNum)
 
                     setTimeout(() => {
                         setHighlightedOrders(prev => prev.filter(id => id !== updatedOrderId))
@@ -97,22 +93,26 @@ export default function ActiveOrdersGrid({ onSelectOrder, onNewItem }: ActiveOrd
             .on(
                 'postgres_changes',
                 { event: 'INSERT', schema: 'public', table: 'order_items' },
-                (payload) => {
-                    // payload.new has order_id. We should highlight that card.
+                async (payload) => {
                     const newOrderId = payload.new.order_id
-                    setHighlightedOrders(prev => [...prev, newOrderId])
 
+                    // Highlight Card
+                    setHighlightedOrders(prev => [...prev, newOrderId])
                     setBadges(prev => ({
                         ...prev,
                         [newOrderId]: (prev[newOrderId] || 0) + 1
                     }))
 
-                    // Trigger Parent Notification (Sound + Bell)
-                    // Lookup Token ID from existing state
-                    const existing = orders.find(o => o.id === newOrderId)
-                    const tokenNum = existing?.token_id || '?'
+                    // Fetch Token ID reliably from DB (Decoupled from local state)
+                    const { data } = await supabase
+                        .from('orders')
+                        .select('token_id')
+                        .eq('id', newOrderId)
+                        .single()
 
-                    if (onNewItem) onNewItem(newOrderId, tokenNum)
+                    if (data && onNewItem) {
+                        onNewItem(newOrderId, data.token_id)
+                    }
 
                     setTimeout(() => {
                         setHighlightedOrders(prev => prev.filter(id => id !== newOrderId))
@@ -124,7 +124,7 @@ export default function ActiveOrdersGrid({ onSelectOrder, onNewItem }: ActiveOrd
         return () => {
             supabase.removeChannel(channel)
         }
-    }, [orders]) // Depend on orders to find token_id if needed, simplified with direct payload check
+    }, []) // Stable subscription, no dependencies
 
     if (loading) return <div className="text-center p-10 text-gray-500">Loading active jobs...</div>
 
