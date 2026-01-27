@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 import { Database } from '@/lib/database.types'
-import { Car, Truck, Bus } from 'lucide-react'
+import { Car, Truck, Bus, ArrowLeft } from 'lucide-react'
 
 type VehicleType = Database['public']['Tables']['vehicle_types']['Row']
 
@@ -29,15 +29,14 @@ export default function VehicleSelector({ onSelect, onBack }: VehicleSelectorPro
 
     return (
         <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
                 <button
                     onClick={onBack}
-                    className="flex items-center text-gray-500 hover:text-gray-900 transition-colors"
+                    className="p-2 -ml-2 text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded-full transition-all"
                 >
-                    <span className="mr-1">←</span> Back
+                    <ArrowLeft size={24} />
                 </button>
                 <h2 className="text-xl font-bold text-gray-900">Select Vehicle Type</h2>
-                <div className="w-16"></div> {/* Spacer for centering */}
             </div>
 
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">

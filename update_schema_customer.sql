@@ -1,7 +1,7 @@
--- Add customer_name to orders table to track who the order belongs to
+-- Add customer_name to orders table if it doesn't exist
 ALTER TABLE orders 
-ADD COLUMN customer_name TEXT;
+ADD COLUMN IF NOT EXISTS customer_name TEXT;
 
--- For good measure, let's also add plate_number if it's separate from customer_name
+-- Add plate_number to orders table if it doesn't exist
 ALTER TABLE orders
-ADD COLUMN plate_number TEXT;
+ADD COLUMN IF NOT EXISTS plate_number TEXT;

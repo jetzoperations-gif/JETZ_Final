@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 import { Database } from '@/lib/database.types'
 import { usePriceMatrix } from '@/lib/hooks/usePriceMatrix'
+import { ArrowLeft } from 'lucide-react'
 
 type Service = Database['public']['Tables']['services']['Row']
 
@@ -27,12 +28,14 @@ export default function ServiceMenu({ vehicleTypeId, onSelect, onBack }: Service
 
     return (
         <div className="space-y-4 animate-in fade-in slide-in-from-right-8 duration-500">
-            <div className="flex items-center justify-between">
-                <button onClick={onBack} className="text-sm font-semibold text-gray-500 hover:text-gray-800">
-                    &larr; Change Vehicle
+            <div className="flex items-center gap-4">
+                <button
+                    onClick={onBack}
+                    className="p-2 -ml-2 text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded-full transition-all"
+                >
+                    <ArrowLeft size={24} />
                 </button>
                 <h2 className="text-xl font-bold text-gray-900">Select Service</h2>
-                <div className="w-20"></div> {/* Spacer */}
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
