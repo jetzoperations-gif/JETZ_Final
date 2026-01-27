@@ -32,11 +32,11 @@ export default function MenuManagement() {
         <div className="space-y-8">
             {/* Services Section */}
             <div className="bg-white p-6 rounded-lg shadow">
-                <h2 className="text-xl font-bold mb-4 text-gray-800 border-b pb-2">Services</h2>
+                <h2 className="text-xl font-bold mb-4 text-gray-900 border-b pb-2">Services</h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                     {services.map((service) => (
-                        <div key={service.id} className="p-4 border rounded hover:bg-gray-50">
-                            <h3 className="font-semibold">{service.name}</h3>
+                        <div key={service.id} className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                            <h3 className="font-bold text-gray-900 text-lg">{service.name}</h3>
                             {/* Future: Show prices per vehicle type here */}
                         </div>
                     ))}
@@ -45,30 +45,30 @@ export default function MenuManagement() {
 
             {/* Inventory Section */}
             <div className="bg-white p-6 rounded-lg shadow">
-                <h2 className="text-xl font-bold mb-4 text-gray-800 border-b pb-2">Cafe Inventory</h2>
+                <h2 className="text-xl font-bold mb-4 text-gray-900 border-b pb-2">Cafe Inventory</h2>
                 <div className="overflow-x-auto">
                     <table className="min-w-full text-left">
                         <thead>
-                            <tr className="bg-gray-100">
-                                <th className="p-3">Item Name</th>
-                                <th className="p-3">Category</th>
-                                <th className="p-3">Price</th>
-                                <th className="p-3">Stock</th>
+                            <tr className="bg-gray-100 border-b border-gray-200">
+                                <th className="p-3 font-bold text-gray-700">Item Name</th>
+                                <th className="p-3 font-bold text-gray-700">Category</th>
+                                <th className="p-3 font-bold text-gray-700">Price</th>
+                                <th className="p-3 font-bold text-gray-700">Stock</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody className="divide-y divide-gray-100">
                             {inventory.map((item) => (
-                                <tr key={item.id} className="border-b hover:bg-gray-50">
-                                    <td className="p-3 font-medium">{item.name}</td>
+                                <tr key={item.id} className="hover:bg-gray-50 transition-colors">
+                                    <td className="p-3 font-semibold text-gray-900">{item.name}</td>
                                     <td className="p-3">
-                                        <span className={`px-2 py-1 rounded text-xs font-semibold
+                                        <span className={`px-2 py-1 rounded text-xs font-bold
                       ${item.category === 'Drinks' ? 'bg-blue-100 text-blue-800' :
                                                 item.category === 'Snacks' ? 'bg-orange-100 text-orange-800' : 'bg-gray-100 text-gray-800'}`}>
                                             {item.category}
                                         </span>
                                     </td>
-                                    <td className="p-3">₱{item.price}</td>
-                                    <td className="p-3">{item.stock_qty}</td>
+                                    <td className="p-3 font-medium text-gray-700">₱{item.price}</td>
+                                    <td className="p-3 font-medium text-gray-700">{item.stock_qty}</td>
                                 </tr>
                             ))}
                         </tbody>

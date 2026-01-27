@@ -5,6 +5,7 @@ import { supabase } from '@/lib/supabase'
 import { Database } from '@/lib/database.types'
 import Link from 'next/link'
 import { Printer } from 'lucide-react'
+import ActiveTokensWidget from '@/components/ActiveTokensWidget'
 
 type Token = Database['public']['Tables']['tokens']['Row']
 
@@ -64,28 +65,28 @@ export default function TokenManagement() {
         <div className="bg-white p-6 rounded-lg shadow">
             <div className="flex justify-between items-center mb-6">
                 <div className="flex items-center gap-4">
-                    <h2 className="text-xl font-bold text-gray-800">Live Token Status</h2>
+                    <h2 className="text-xl font-bold text-gray-900">Live Token Status</h2>
                     <button
                         onClick={handleGenerateTokens}
                         disabled={generating || tokens.length >= 50}
-                        className="text-xs bg-gray-100 hover:bg-gray-200 text-gray-600 px-3 py-1 rounded-full font-bold transition-colors disabled:opacity-50"
+                        className="text-xs bg-gray-100 hover:bg-gray-200 text-gray-800 px-3 py-1 rounded-full font-bold transition-colors disabled:opacity-50 border border-gray-200"
                     >
                         {generating ? 'Generating...' : tokens.length < 50 ? '+ Initialize Tokens' : 'Tokens Ready'}
                     </button>
                     <Link
                         href="/admin/print-tokens"
-                        className="text-xs bg-blue-100 hover:bg-blue-200 text-blue-700 px-3 py-1 rounded-full font-bold transition-colors flex items-center gap-1"
+                        className="text-xs bg-blue-100 hover:bg-blue-200 text-blue-800 px-3 py-1 rounded-full font-bold transition-colors flex items-center gap-1 border border-blue-200"
                     >
                         <Printer size={12} /> Print Cards
                     </Link>
                 </div>
-                <div className="flex gap-2">
-                    <span className="flex items-center text-sm"><div className="w-3 h-3 bg-green-500 rounded-full mr-1"></div> Available</span>
-                    <span className="flex items-center text-sm"><div className="w-3 h-3 bg-red-500 rounded-full mr-1"></div> Active</span>
+                <div className="flex gap-3">
+                    <span className="flex items-center text-sm font-bold text-gray-700"><div className="w-3 h-3 bg-green-500 rounded-full mr-2 shadow-sm"></div> Available</span>
+                    <span className="flex items-center text-sm font-bold text-gray-700"><div className="w-3 h-3 bg-red-500 rounded-full mr-2 shadow-sm"></div> Active</span>
                 </div>
             </div>
 
-            <div className="grid grid-cols-5 sm:grid-cols-8 md:grid-cols-10 gap-2">
+            <div className="grid grid-cols-5 sm:grid-cols-8 md:grid-cols-10 gap-2 mb-8">
                 {tokens.map((token) => (
                     <div
                         key={token.id}
@@ -99,6 +100,11 @@ export default function TokenManagement() {
                         {token.id}
                     </div>
                 ))}
+            </div>
+
+            <div className="border-t pt-6">
+                <h3 className="text-lg font-bold text-gray-900 mb-4">Detailed Active Orders</h3>
+                <ActiveTokensWidget />
             </div>
         </div>
     )
