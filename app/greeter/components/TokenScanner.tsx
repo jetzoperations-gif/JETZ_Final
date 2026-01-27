@@ -56,15 +56,15 @@ export default function TokenScanner({ onTokenVerified }: TokenScannerProps) {
 
     return (
         <div className="bg-white p-6 rounded-lg shadow-sm border text-center">
-            <ScanLine size={48} className="mx-auto text-blue-500 mb-4" />
-            <h2 className="text-xl font-bold mb-4">Scan QR Token</h2>
+            <ScanLine size={48} className="mx-auto text-blue-600 mb-4" />
+            <h2 className="text-xl font-bold mb-4 text-gray-800">Scan QR Token</h2>
 
             <form onSubmit={handleVerify} className="max-w-xs mx-auto space-y-4">
                 <input
                     ref={inputRef}
                     type="number"
-                    className="w-full text-center text-2xl font-mono p-3 border-2 border-blue-200 rounded-lg focus:border-blue-500 outline-none text-gray-900 bg-white placeholder:text-gray-400"
-                    placeholder="Token #"
+                    className="w-full text-center text-2xl font-mono p-3 border-2 border-blue-200 rounded-lg focus:border-blue-500 outline-none text-gray-900 bg-white placeholder:text-gray-500 font-bold"
+                    placeholder="Enter Token #"
                     value={inputVal}
                     onChange={(e) => setInputVal(e.target.value)}
                 // Scanners usually send "Enter" key
