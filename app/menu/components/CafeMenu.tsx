@@ -329,7 +329,7 @@ export default function CafeMenu() {
                                             value={tokenInput}
                                             onChange={e => setTokenInput(e.target.value)}
                                             placeholder="Ex: 5"
-                                            className="w-full text-center text-xl font-bold p-2 rounded-lg border-2 border-blue-200 focus:border-blue-500 outline-none"
+                                            className="w-full text-center text-xl font-bold p-2 rounded-lg border-2 border-blue-200 focus:border-blue-500 outline-none text-gray-900 placeholder:text-gray-400"
                                         />
                                         <p className="text-xs text-blue-600 mt-2 text-center">Found on your car dashboard</p>
                                     </div>
