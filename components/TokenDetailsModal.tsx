@@ -144,9 +144,92 @@ export default function TokenDetailsModal({ orderId, onClose }: TokenDetailsModa
 
                 {/* Footer Actions */}
                 <div className="p-4 bg-gray-50 border-t flex gap-3">
-                    <button className="flex-1 flex items-center justify-center gap-2 bg-white border border-gray-300 py-3 rounded-lg font-bold text-gray-700 hover:bg-gray-100 transition-colors">
+                    <button
+                        onClick={() => {
+                            // Create a printable window or use a print-only CSS block
+                            // Simplest approach: Add a hidden print section and use media queries
+                            const printContent = document.getElementById('printable-receipt');
+                            const originalContent = document.body.innerHTML;
+
+                            if (printContent) {
+                                // Proper way to print specific element without losing event listeners is harder in SPA
+                                // Better way: Open new window
+                                const win = window.open('', '', 'height=600,width=400');
+                                if (win) {
+                                    win.document.write('<html><head><title>Receipt</title>');
+                                    win.document.write('<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">'); // CDN for styling
+                                    win.document.write('</head><body class="bg-white p-4">');
+                                    win.document.write(printContent.innerHTML);
+                                    win.document.write('</body></html>');
+                                    win.document.close();
+                                    win.focus();
+                                    // wrapper to ensure styles loaded
+                                    setTimeout(() => {
+                                        win.print();
+                                        win.close();
+                                    }, 500);
+                                }
+                            }
+                        }}
+                        className="flex-1 flex items-center justify-center gap-2 bg-white border border-gray-300 py-3 rounded-lg font-bold text-gray-700 hover:bg-gray-100 transition-colors"
+                    >
                         <Printer size={18} /> Print
                     </button>
+
+                    {/* Hidden Printable Receipt Template */}
+                    <div id="printable-receipt" className="hidden">
+                        <div className="text-center mb-6">
+                            <h1 className="text-2xl font-bold uppercase tracking-wider">Jetz Carwash</h1>
+                            <p className="text-sm text-gray-500">Official Receipt</p>
+                        </div>
+
+                        <div className="mb-4 border-b pb-4">
+                            <div className="flex justify-between text-sm">
+                                <span className="text-gray-500">Date:</span>
+                                <span className="font-bold">{new Date().toLocaleDateString()}</span>
+                            </div>
+                            <div className="flex justify-between text-sm mt-1">
+                                <span className="text-gray-500">Token:</span>
+                                <span className="font-bold">#{order.token_id}</span>
+                            </div>
+                            <div className="flex justify-between text-sm mt-1">
+                                <span className="text-gray-500">Vehicle:</span>
+                                <span className="font-bold">{order.vehicle_types?.name}</span>
+                            </div>
+                            {order.plate_number && (
+                                <div className="flex justify-between text-sm mt-1">
+                                    <span className="text-gray-500">Plate:</span>
+                                    <span className="font-bold uppercase">{order.plate_number}</span>
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="space-y-2 mb-4">
+                            {/* Service */}
+                            <div className="flex justify-between text-sm">
+                                <span>{order.services?.name}</span>
+                                <span className="font-bold">Service</span>
+                            </div>
+
+                            {/* Items */}
+                            {items.map((item: any) => (
+                                <div key={item.id} className="flex justify-between text-sm">
+                                    <span>{item.quantity}x {item.item_name}</span>
+                                    <span className="font-bold">₱{(item.price_snapshot * item.quantity).toFixed(2)}</span>
+                                </div>
+                            ))}
+                        </div>
+
+                        <div className="border-t border-dashed pt-4 flex justify-between items-center text-lg">
+                            <span className="font-bold">TOTAL</span>
+                            <span className="font-black">₱{totalAmount.toFixed(2)}</span>
+                        </div>
+
+                        <div className="mt-8 text-center text-xs text-gray-400">
+                            <p>Thank you for choosing Jetz!</p>
+                            <p>Please come again.</p>
+                        </div>
+                    </div>
                     <button onClick={onClose} className="flex-1 bg-slate-900 text-white py-3 rounded-lg font-bold hover:bg-slate-800 transition-colors">
                         Close
                     </button>
