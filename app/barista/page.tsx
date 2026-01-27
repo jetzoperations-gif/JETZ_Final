@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import MainLayout from '@/components/MainLayout'
 import ActiveOrdersGrid from './components/ActiveOrdersGrid'
@@ -72,15 +72,18 @@ export default function BaristaPage() {
         })
     }
 
-    const handleNewNotification = (orderId: string, tokenId: string | number = 0) => {
-        // Prevent Duplicates: Check if we already have a recent notification for this Order ID (within 5 seconds)
-        // This handles cases where multiple DB events fire for one action (e.g. Order Insert + Items Insert)
-        const recentDuplicate = notifications.find(n =>
-            n.orderId === orderId &&
-            (new Date().getTime() - n.time.getTime()) < 5000
-        )
+    const lastNotifRef = useRef<{ id: string, time: number }>({ id: '', time: 0 })
 
-        if (recentDuplicate) return
+    const handleNewNotification = (orderId: string, tokenId: string | number = 0) => {
+        const now = Date.now()
+        // Synchronous check against ref (prevents race conditions)
+        if (lastNotifRef.current.id === orderId && (now - lastNotifRef.current.time) < 5000) {
+            console.log('Duplicate notification prevented', orderId)
+            return
+        }
+
+        // Update ref immediately
+        lastNotifRef.current = { id: orderId, time: now }
 
         // Add to list
         setNotifications(prev => {
