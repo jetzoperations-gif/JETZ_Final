@@ -66,23 +66,27 @@ export default function ActiveOrdersGrid({ onSelectOrder, onNewItem }: ActiveOrd
                     const updatedOrderId = payload.new.id
                     let tokenNum = payload.new.token_id
 
-                    // 1. Highlight Card
+                    // 1. Highlight Card (Bounce Effect only)
                     setHighlightedOrders(prev => [...prev, updatedOrderId])
 
-                    // 2. Increment Badge Count
-                    setBadges(prev => ({
-                        ...prev,
-                        [updatedOrderId]: (prev[updatedOrderId] || 0) + 1
-                    }))
+                    // Note: We REMOVED the setBadges increment here to avoid Double Counting.
+                    // The 'INSERT' on order_items below will handle the Badge increment + 'New Update' badge.
+                    // This listener now just ensures the card visual 'bounce' and data refresh happens.
 
-                    // 3. Trigger Global Notification
-                    // Fetch token if missing (though usually in payload)
+                    // 3. Trigger Global Notification (Optional here if items handle it, but maybe safer to keep for non-item updates? 
+                    // Actually, if we want to avoid double global alerts too, we might want to restrict this.
+                    // But for now, the user complaint was specifically about the "Square Box" (Card) havng '2'.
+                    // So removing setBadges here solves that specific UI issue.
+
+                    // Trigger Callbacks
                     if (!tokenNum) {
                         const { data } = await supabase.from('orders').select('token_id').eq('id', updatedOrderId).single()
                         if (data) tokenNum = data.token_id
                     }
 
-                    if (onNewItem && tokenNum) onNewItem(updatedOrderId, tokenNum)
+                    // We only call onNewItem if we want the bell to ring? 
+                    // Let's comment this out too to avoid double Bell rings if the Item Insert handles it.
+                    // if (onNewItem && tokenNum) onNewItem(updatedOrderId, tokenNum)
 
                     setTimeout(() => {
                         setHighlightedOrders(prev => prev.filter(id => id !== updatedOrderId))
