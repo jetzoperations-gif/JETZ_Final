@@ -61,6 +61,23 @@ export default function TokenManagement() {
         setGenerating(false)
     }
 
+    const handleTokenClick = async (tokenId: number) => {
+        const { data, error } = await supabase
+            .from('orders')
+            .select('*, vehicle_types(name)')
+            .eq('token_id', tokenId)
+            .eq('status', 'queued') // Only active jobs
+            .single()
+
+        if (data) {
+            // Simple alert for now as requested "click showing details"
+            // A modal would be better but alert is instant/reliable for V1
+            alert(`Token #${tokenId} Details:\n\nCustomer: ${data.customer_name}\nPlate: ${data.plate_number || 'N/A'}\nVehicle: ${data.vehicle_types?.name}\nTotal: ₱${data.total_amount}`)
+        } else {
+            alert(`Token #${tokenId} is marked active but no queued order found.`)
+        }
+    }
+
     return (
         <div className="bg-white p-6 rounded-lg shadow">
             <div className="flex justify-between items-center mb-6">
@@ -90,11 +107,12 @@ export default function TokenManagement() {
                 {tokens.map((token) => (
                     <div
                         key={token.id}
+                        onClick={() => token.status === 'active' && handleTokenClick(token.id)}
                         className={`
-              aspect-square flex items-center justify-center rounded-lg font-bold text-lg border-2
+              aspect-square flex items-center justify-center rounded-lg font-bold text-lg border-2 transition-all
               ${token.status === 'active'
-                                ? 'bg-red-50 border-red-200 text-red-600'
-                                : 'bg-green-50 border-green-200 text-green-600'}
+                                ? 'bg-red-50 border-red-200 text-red-600 cursor-pointer hover:bg-red-100 hover:scale-105 shadow-sm'
+                                : 'bg-green-50 border-green-200 text-green-600 opacity-50'}
             `}
                     >
                         {token.id}

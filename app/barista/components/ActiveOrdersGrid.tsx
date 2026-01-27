@@ -164,9 +164,14 @@ export default function ActiveOrdersGrid({ onSelectOrder, onNewItem }: ActiveOrd
 
                     {/* RED NOTIFICATION BADGE on the Card */}
                     {badges[order.id] > 0 && (
-                        <div className="absolute top-2 right-2 animate-bounce bg-red-600 text-white text-[10px] font-bold w-6 h-6 flex items-center justify-center rounded-full z-10 shadow-md border-2 border-white">
-                            {badges[order.id]}
-                        </div>
+                        <>
+                            <div className="absolute top-2 right-2 animate-bounce bg-red-600 text-white text-[10px] font-bold w-6 h-6 flex items-center justify-center rounded-full z-10 shadow-md border-2 border-white">
+                                {badges[order.id]}
+                            </div>
+                            <div className="absolute -top-2 left-1/2 -translate-x-1/2 bg-amber-400 text-amber-900 text-[10px] font-extrabold px-3 py-0.5 rounded-full shadow-sm z-20 animate-pulse border border-amber-200 uppercase tracking-wider">
+                                New Update!
+                            </div>
+                        </>
                     )}
 
                     {/* Bounce Effect for "Just Updated" */}
