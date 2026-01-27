@@ -223,7 +223,15 @@ export default function ConsumablesModal({ orderId, vehicleName, tokenId, onClos
 
                 {/* Footer */}
                 <div className="p-4 border-t bg-gray-50 rounded-b-xl text-center">
-                    <p className="text-xs text-gray-500">Tap an item to instantly log it to this job.</p>
+                    <div className="flex justify-between items-center w-full">
+                        <p className="text-xs text-gray-500 text-left">Tap item to log.</p>
+                        <button
+                            onClick={onClose}
+                            className="bg-blue-600 text-white text-sm font-bold px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors shadow-sm"
+                        >
+                            Done / Back to Board
+                        </button>
+                    </div>
                 </div>
             </div>
 
