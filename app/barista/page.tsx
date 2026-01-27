@@ -73,6 +73,15 @@ export default function BaristaPage() {
     }
 
     const handleNewNotification = (orderId: string, tokenId: string | number = 0) => {
+        // Prevent Duplicates: Check if we already have a recent notification for this Order ID (within 5 seconds)
+        // This handles cases where multiple DB events fire for one action (e.g. Order Insert + Items Insert)
+        const recentDuplicate = notifications.find(n =>
+            n.orderId === orderId &&
+            (new Date().getTime() - n.time.getTime()) < 5000
+        )
+
+        if (recentDuplicate) return
+
         // Add to list
         setNotifications(prev => {
             const newVal = [{
