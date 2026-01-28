@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { supabase } from '@/lib/supabase'
-import { Copy, FileText, Loader2, Settings } from 'lucide-react'
+import { Copy, FileText, Loader2, Share2, MessageSquare, MessageCircle, Phone, X } from 'lucide-react'
 
 export default function DailySummary() {
     const [generating, setGenerating] = useState(false)
@@ -74,11 +74,13 @@ Total Cars: ${totalCars}
         setGenerating(false)
     }
 
-    const handleSMS = async () => {
+    const [showShareModal, setShowShareModal] = useState(false)
+
+    const handleShare = async (platform: 'sms' | 'whatsapp' | 'viber' | 'copy') => {
         let currentNumber = ownerNumber
 
-        if (!currentNumber) {
-            const num = prompt('Please enter the Owner Mobile Number first:', '')
+        if (platform !== 'copy' && !currentNumber) {
+            const num = prompt('Please enter the Owner Mobile Number (e.g. 09123456789):', '')
             if (!num) return
             setOwnerNumber(num)
             localStorage.setItem('jetz_owner_number', num)
@@ -87,70 +89,108 @@ Total Cars: ${totalCars}
 
         setGenerating(true)
         const report = await getReportText()
-        const targetNumber = currentNumber || ''
-
-        // Use location.href instead of window.open to avoid blank tabs
-        window.location.href = `sms:${targetNumber}?body=${encodeURIComponent(report)}`
-
         setGenerating(false)
-    }
+        setShowShareModal(false) // Close modal after selection
 
-    const handleWhatsApp = async () => {
-        let currentNumber = ownerNumber
+        const encodedReport = encodeURIComponent(report)
 
-        if (!currentNumber) {
-            const num = prompt('Please enter the Owner Mobile Number (e.g. 639123456789):', '')
-            if (!num) return
-            setOwnerNumber(num)
-            localStorage.setItem('jetz_owner_number', num)
-            currentNumber = num
+        // Format number for international apps
+        let intlNum = currentNumber.replace(/\D/g, '')
+        if (intlNum.startsWith('0')) intlNum = '63' + intlNum.substring(1)
+
+        switch (platform) {
+            case 'sms':
+                window.location.href = `sms:${currentNumber}?body=${encodedReport}`
+                break
+            case 'whatsapp':
+                window.open(`https://wa.me/${intlNum}?text=${encodedReport}`, '_blank')
+                break
+            case 'viber':
+                window.open(`viber://forward?text=${encodedReport}`, '_blank')
+                break
+            case 'copy':
+                try {
+                    await navigator.clipboard.writeText(report)
+                    alert('Report copied to clipboard!')
+                } catch (err) {
+                    alert('Failed to copy. Please select text manually.')
+                }
+                break
         }
-
-        // Ensure number format for WhatsApp (remove leading 0 if present, add 63)
-        let formattedNum = currentNumber.replace(/\D/g, '')
-        if (formattedNum.startsWith('0')) formattedNum = '63' + formattedNum.substring(1)
-
-        setGenerating(true)
-        const report = await getReportText()
-        window.open(`https://wa.me/${formattedNum}?text=${encodeURIComponent(report)}`, '_blank')
-        setGenerating(false)
     }
 
     return (
-        <div className="flex gap-2 items-center">
-            <div className="flex bg-gray-100 rounded-lg p-1 border border-gray-200 gap-1">
-                <button
-                    onClick={handleSMS}
-                    disabled={generating}
-                    className="flex items-center gap-2 bg-green-500 text-white px-3 py-2 rounded-md hover:bg-green-600 transition-colors shadow-sm font-medium"
-                    title={ownerNumber ? `SMS to ${ownerNumber}` : "Send SMS"}
-                >
-                    {generating ? <Loader2 className="animate-spin" size={18} /> : <div className="flex items-center gap-2">SMS 💬</div>}
-                </button>
-                <button
-                    onClick={handleWhatsApp}
-                    disabled={generating}
-                    className="flex items-center gap-2 bg-green-600 text-white px-3 py-2 rounded-md hover:bg-green-700 transition-colors shadow-sm font-medium"
-                    title={ownerNumber ? `WhatsApp to ${ownerNumber}` : "Send WhatsApp"}
-                >
-                    {generating ? <Loader2 className="animate-spin" size={18} /> : <div className="flex items-center gap-2">WA 🟢</div>}
-                </button>
-                <button
-                    onClick={configureNumber}
-                    className="px-3 py-2 text-gray-500 hover:text-gray-700 hover:bg-gray-200 rounded-md transition-colors border-l border-gray-300 bg-gray-50 flex flex-col justify-center items-center leading-none"
-                    title="Configure Owner Number"
-                >
-                    {ownerNumber ? <span className="text-[10px] font-mono font-bold text-gray-600">{ownerNumber}</span> : <span className="text-xs font-bold text-blue-600">SET NO.</span>}
-                </button>
+        <>
+            <div className="flex gap-2 items-center">
+                <div className="flex bg-gray-100 rounded-lg p-1 border border-gray-200">
+                    <button
+                        onClick={() => setShowShareModal(true)}
+                        disabled={generating}
+                        className="flex items-center gap-2 bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition-colors shadow-sm font-medium"
+                    >
+                        {generating ? <Loader2 className="animate-spin" size={18} /> : (
+                            <div className="flex items-center gap-2">
+                                <Share2 size={18} /> Share Report
+                            </div>
+                        )}
+                    </button>
+                    <button
+                        onClick={configureNumber}
+                        className="px-3 py-2 text-gray-500 hover:text-gray-700 hover:bg-gray-200 rounded-md transition-colors border-l border-gray-300 bg-gray-50 flex flex-col justify-center items-center leading-none"
+                        title="Configure Owner Number"
+                    >
+                        {ownerNumber ? <span className="text-[10px] font-mono font-bold text-gray-600">{ownerNumber}</span> : <span className="text-xs font-bold text-blue-600">SET NO.</span>}
+                    </button>
+                </div>
             </div>
 
-            <button
-                onClick={generateReport}
-                disabled={generating}
-                className="flex items-center gap-2 bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors shadow-sm font-medium"
-            >
-                {generating ? <Loader2 className="animate-spin" size={18} /> : <div className="flex items-center gap-2"><Copy size={18} /> Copy</div>}
-            </button>
-        </div>
+            {/* Share Modal */}
+            {showShareModal && (
+                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in duration-200">
+                    <div className="bg-white w-full max-w-sm rounded-xl shadow-2xl p-6 relative">
+                        <button
+                            onClick={() => setShowShareModal(false)}
+                            className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
+                        >
+                            <X size={20} />
+                        </button>
+
+                        <h3 className="text-xl font-bold text-gray-800 mb-2">Share Daily Report</h3>
+                        <p className="text-sm text-gray-500 mb-6">Choose how you want to send the report to <span className="font-mono font-bold text-gray-700">{ownerNumber || 'Owner'}</span></p>
+
+                        <div className="grid grid-cols-1 gap-3">
+                            <button
+                                onClick={() => handleShare('sms')}
+                                className="flex items-center justify-center gap-3 w-full bg-blue-500 text-white py-3 rounded-lg hover:bg-blue-600 transition-colors font-medium"
+                            >
+                                <MessageSquare size={20} /> Send via SMS
+                            </button>
+
+                            <button
+                                onClick={() => handleShare('whatsapp')}
+                                className="flex items-center justify-center gap-3 w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition-colors font-medium"
+                            >
+                                <MessageCircle size={20} /> Send via WhatsApp
+                            </button>
+
+                            <button
+                                onClick={() => handleShare('viber')}
+                                className="flex items-center justify-center gap-3 w-full bg-[#7360f2] text-white py-3 rounded-lg hover:opacity-90 transition-colors font-medium"
+                            >
+                                <Phone size={20} /> Send via Viber
+                            </button>
+
+                            <div className="border-t border-gray-100 my-2"></div>
+
+                            <button
+                                onClick={() => handleShare('copy')}
+                                className="flex items-center justify-center gap-3 w-full bg-gray-100 text-gray-700 py-3 rounded-lg hover:bg-gray-200 transition-colors font-medium"
+                            >
+                                <Copy size={20} /> Copy to Clipboard
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+        </>
     )
-}
