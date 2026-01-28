@@ -28,7 +28,7 @@ export default function CashierPage() {
         vehicle_types ( name )
       `)
             .in('status', ['queued', 'washing', 'drying', 'detailing', 'ready', 'completed'])
-            .order('created_at', { ascending: true })
+            .order('token_id', { ascending: true })
 
         if (data) setOrders(data as any)
         setLoading(false)
