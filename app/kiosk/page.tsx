@@ -40,6 +40,9 @@ function KioskContent() {
 
                 if (tokenData && tokenData.status === 'available') {
                     setAutoToken(t)
+                } else if (tokenData && tokenData.status === 'active') {
+                    // Token is already in use (Customer is waiting) -> Send to Cafe Menu
+                    window.location.href = `/menu?token=${t}`
                 } else if (tokenData) {
                     alert(`Token #${t} is currently ${tokenData.status}. Please use another token or ask staff.`)
                 }

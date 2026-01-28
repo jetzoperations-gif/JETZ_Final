@@ -1,5 +1,6 @@
 'use client'
 
+import { useSearchParams } from 'next/navigation'
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 import { Database } from '@/lib/database.types'
@@ -17,6 +18,9 @@ const CATEGORIES = ['All', 'Drinks', 'Snacks', 'CarCare'] as const
 type Category = typeof CATEGORIES[number]
 
 export default function CafeMenu() {
+    const searchParams = useSearchParams()
+    const urlToken = searchParams.get('token')
+
     const [items, setItems] = useState<InventoryItem[]>([])
     const [loading, setLoading] = useState(true)
     const [activeCategory, setActiveCategory] = useState<Category>('All')
@@ -35,8 +39,11 @@ export default function CafeMenu() {
     }
 
     useEffect(() => {
+        if (urlToken) {
+            setTokenInput(urlToken)
+        }
         fetchInventory()
-    }, [])
+    }, [urlToken])
 
     const fetchInventory = async () => {
         const { data } = await supabase
@@ -323,13 +330,16 @@ export default function CafeMenu() {
                                     </div>
 
                                     <div className="bg-blue-50 p-4 rounded-xl border border-blue-100">
-                                        <label className="block text-xs font-bold text-blue-800 uppercase mb-1">Enter your Token #</label>
+                                        <label className="block text-xs font-bold text-blue-800 uppercase mb-1">
+                                            {urlToken ? 'Linked Token #' : 'Enter your Token #'}
+                                        </label>
                                         <input
                                             type="number"
                                             value={tokenInput}
                                             onChange={e => setTokenInput(e.target.value)}
                                             placeholder="Ex: 5"
-                                            className="w-full text-center text-xl font-bold p-2 rounded-lg border-2 border-blue-200 focus:border-blue-500 outline-none text-gray-900 placeholder:text-gray-400"
+                                            disabled={!!urlToken}
+                                            className="w-full text-center text-xl font-bold p-2 rounded-lg border-2 border-blue-200 focus:border-blue-500 outline-none text-gray-900 placeholder:text-gray-400 disabled:bg-blue-100 disabled:text-blue-800"
                                         />
                                         <p className="text-xs text-blue-600 mt-2 text-center">Found on your car dashboard</p>
                                     </div>
