@@ -76,8 +76,17 @@ export default function CashierPage() {
                                 className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm hover:shadow-md hover:border-blue-400 transition-all text-left flex justify-between items-center group"
                             >
                                 <div>
-                                    <div className="text-xs font-bold text-blue-600 uppercase tracking-wider mb-1">
-                                        Token #{order.token_id}
+                                    <div className="flex justify-between items-start mb-1">
+                                        <div className="text-xs font-bold text-blue-600 uppercase tracking-wider">
+                                            Token #{order.token_id}
+                                        </div>
+                                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase
+                                            ${order.status === 'ready' ? 'bg-green-100 text-green-700 animate-pulse' :
+                                                order.status === 'working' ? 'bg-blue-100 text-blue-700 animate-pulse' :
+                                                    order.status === 'queued' ? 'bg-yellow-100 text-yellow-700' :
+                                                        'bg-gray-100 text-gray-600'}`}>
+                                            {order.status}
+                                        </span>
                                     </div>
                                     <h3 className="text-xl font-bold text-gray-800">
                                         {order.customer_name} • <span className="text-gray-500 font-mono text-base">{order.plate_number}</span>
