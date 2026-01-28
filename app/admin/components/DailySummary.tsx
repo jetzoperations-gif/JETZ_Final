@@ -194,3 +194,4 @@ Total Cars: ${totalCars}
             )}
         </>
     )
+}
