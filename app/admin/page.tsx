@@ -7,10 +7,11 @@ import TokenManagement from './components/TokenManagement'
 import SalesReports from './components/SalesReports'
 import DailySummary from './components/DailySummary'
 import WasherLeaderboard from './components/WasherLeaderboard'
-import { LayoutDashboard, Coffee, Receipt, Ticket } from 'lucide-react'
+import StaffManagement from './components/StaffManagement'
+import { LayoutDashboard, Coffee, Receipt, Ticket, Users } from 'lucide-react'
 
 export default function AdminPage() {
-    const [activeTab, setActiveTab] = useState<'dashboard' | 'menu' | 'tokens' | 'reports'>('dashboard')
+    const [activeTab, setActiveTab] = useState<'dashboard' | 'menu' | 'tokens' | 'reports' | 'team'>('dashboard')
 
     return (
         <MainLayout title="Admin Dashboard" role="admin">
@@ -60,6 +61,17 @@ export default function AdminPage() {
                         <Receipt size={20} />
                         <span>Sales Reports</span>
                     </button>
+
+                    {/* Team Tab */}
+                    <button
+                        onClick={() => setActiveTab('team')}
+                        className={`flex items-center gap-3 p-3 rounded-lg text-left transition-colors
+              ${activeTab === 'team' ? 'bg-blue-100 text-blue-700 font-semibold' : 'hover:bg-gray-100 text-gray-600'}
+            `}
+                    >
+                        <Users size={20} />
+                        <span>Team Management</span>
+                    </button>
                 </nav>
 
                 {/* Content Area */}
@@ -79,6 +91,7 @@ export default function AdminPage() {
                     {activeTab === 'menu' && <MenuManagement />}
                     {activeTab === 'tokens' && <TokenManagement />}
                     {activeTab === 'reports' && <SalesReports />}
+                    {activeTab === 'team' && <StaffManagement />}
                 </div>
             </div>
         </MainLayout>

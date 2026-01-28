@@ -10,7 +10,7 @@ interface ProtectedRouteProps {
 }
 
 export default function ProtectedRoute({ children, requiredRole }: ProtectedRouteProps) {
-    const { staffSession, login, isLoading } = useAuth()
+    const { staffSession, login, logout, isLoading } = useAuth()
     const [isClient, setIsClient] = useState(false)
 
     useEffect(() => {
@@ -37,7 +37,9 @@ export default function ProtectedRoute({ children, requiredRole }: ProtectedRout
                 <h1 className="text-2xl font-bold text-red-600">Access Denied</h1>
                 <p>You need to be a {requiredRole} to view this page.</p>
                 <button
-                    onClick={() => window.location.reload()} // Simple logout/reset trigger effectively
+                    onClick={() => {
+                        logout() // Clear session
+                    }}
                     className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
                 >
                     Switch User
