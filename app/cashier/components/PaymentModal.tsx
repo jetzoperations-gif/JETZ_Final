@@ -42,20 +42,23 @@ export default function PaymentModal({ orderId, vehicleName, customerName, plate
         fetchDetails()
     }, [orderId])
 
-    const handleMarkAsReady = async () => {
+    const updateStatus = async (newStatus: string) => {
         setProcessing(true)
         const { error } = await supabase
             .from('orders')
-            .update({ status: 'ready' })
+            .update({ status: newStatus })
             .eq('id', orderId)
 
         if (error) {
             alert('Error: ' + error.message)
         } else {
-            setStatus('ready') // Update local status so button disappears/changes
+            setStatus(newStatus)
         }
         setProcessing(false)
     }
+
+    const handleMarkAsReady = () => updateStatus('ready')
+    const handleMarkAsWashing = () => updateStatus('washing')
 
     const handleMarkAsPaid = async () => {
         setProcessing(true)
@@ -128,7 +131,17 @@ export default function PaymentModal({ orderId, vehicleName, customerName, plate
                             </div>
 
                             <div className="grid grid-cols-2 gap-3 mt-6">
-                                {status !== 'ready' && (
+                                {status === 'queued' && (
+                                    <button
+                                        onClick={handleMarkAsWashing}
+                                        disabled={processing}
+                                        className="col-span-2 bg-blue-500 text-white py-3 rounded-xl font-bold hover:bg-blue-600 transition-colors flex justify-center items-center"
+                                    >
+                                        <Loader2 className="mr-2" size={20} /> START WASHING
+                                    </button>
+                                )}
+
+                                {status !== 'ready' && status !== 'queued' && (
                                     <button
                                         onClick={handleMarkAsReady}
                                         disabled={processing}
