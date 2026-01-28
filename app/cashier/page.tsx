@@ -27,7 +27,7 @@ export default function CashierPage() {
         *,
         vehicle_types ( name )
       `)
-            .in('status', ['queued', 'completed']) // Adjust based on your workflow
+            .in('status', ['queued', 'washing', 'drying', 'detailing', 'ready', 'completed'])
             .order('created_at', { ascending: true })
 
         if (data) setOrders(data as any)
@@ -80,8 +80,11 @@ export default function CashierPage() {
                                         Token #{order.token_id}
                                     </div>
                                     <h3 className="text-xl font-bold text-gray-800">
-                                        {order.vehicle_types?.name}
+                                        {order.customer_name} • <span className="text-gray-500 font-mono text-base">{order.plate_number}</span>
                                     </h3>
+                                    <div className="text-sm text-gray-600 font-medium mb-1">
+                                        {order.vehicle_types?.name}
+                                    </div>
                                     <p className="text-sm text-gray-500 mt-1">
                                         {new Date(order.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                     </p>
@@ -99,6 +102,9 @@ export default function CashierPage() {
                         orderId={selectedOrder.id}
                         tokenId={selectedOrder.token_id || 0}
                         vehicleName={selectedOrder.vehicle_types?.name || 'Vehicle'}
+                        customerName={selectedOrder.customer_name || 'Guest'}
+                        plateNumber={selectedOrder.plate_number || '---'}
+                        orderStatus={selectedOrder.status}
                         onClose={() => setSelectedOrder(null)}
                         onPaymentSuccess={handlePaymentSuccess}
                     />

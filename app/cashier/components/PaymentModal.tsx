@@ -10,15 +10,19 @@ type OrderItem = Database['public']['Tables']['order_items']['Row']
 interface PaymentModalProps {
     orderId: string
     vehicleName: string
+    customerName: string
+    plateNumber: string
     tokenId: number
+    orderStatus: string // Add this
     onClose: () => void
     onPaymentSuccess: () => void
 }
 
-export default function PaymentModal({ orderId, vehicleName, tokenId, onClose, onPaymentSuccess }: PaymentModalProps) {
+export default function PaymentModal({ orderId, vehicleName, customerName, plateNumber, orderStatus, tokenId, onClose, onPaymentSuccess }: PaymentModalProps) {
     const [items, setItems] = useState<OrderItem[]>([])
     const [loading, setLoading] = useState(true)
     const [processing, setProcessing] = useState(false)
+    const [status, setStatus] = useState(orderStatus) // Local status state
     const [total, setTotal] = useState(0)
 
     useEffect(() => {
@@ -37,6 +41,21 @@ export default function PaymentModal({ orderId, vehicleName, tokenId, onClose, o
         }
         fetchDetails()
     }, [orderId])
+
+    const handleMarkAsReady = async () => {
+        setProcessing(true)
+        const { error } = await supabase
+            .from('orders')
+            .update({ status: 'ready' })
+            .eq('id', orderId)
+
+        if (error) {
+            alert('Error: ' + error.message)
+        } else {
+            setStatus('ready') // Update local status so button disappears/changes
+        }
+        setProcessing(false)
+    }
 
     const handleMarkAsPaid = async () => {
         setProcessing(true)
@@ -77,7 +96,13 @@ export default function PaymentModal({ orderId, vehicleName, tokenId, onClose, o
                     </button>
                     <ReceiptText size={48} className="mx-auto mb-2 opacity-80" />
                     <h2 className="text-2xl font-bold">Job Summary</h2>
-                    <p className="opacity-90">Token #{tokenId} • {vehicleName}</p>
+                    <p className="opacity-90 font-medium">{customerName} • {plateNumber}</p>
+                    <p className="opacity-75 text-sm mt-1">Token #{tokenId} • {vehicleName}</p>
+                    <div className="mt-2">
+                        <span className={`px-2 py-1 rounded text-xs font-bold uppercase ${status === 'ready' ? 'bg-green-400 text-green-900 animate-pulse' : 'bg-blue-800 text-blue-200'}`}>
+                            {status === 'ready' ? 'READY FOR PICKUP' : status}
+                        </span>
+                    </div>
                 </div>
 
                 <div className="p-6">
@@ -103,6 +128,16 @@ export default function PaymentModal({ orderId, vehicleName, tokenId, onClose, o
                             </div>
 
                             <div className="grid grid-cols-2 gap-3 mt-6">
+                                {status !== 'ready' && (
+                                    <button
+                                        onClick={handleMarkAsReady}
+                                        disabled={processing}
+                                        className="col-span-2 bg-yellow-400 text-yellow-900 py-3 rounded-xl font-bold hover:bg-yellow-500 transition-colors flex justify-center items-center"
+                                    >
+                                        <CheckCircle className="mr-2" size={20} /> MARK AS READY
+                                    </button>
+                                )}
+
                                 <a
                                     href={`sms:?body=Hi! Your vehicle ${vehicleName} is ready at Jetz Carwash. Total due: P${total.toFixed(2)}. Thank you!`}
                                     className="flex items-center justify-center gap-2 bg-blue-100 text-blue-700 py-3 rounded-xl font-bold hover:bg-blue-200 transition-colors"
