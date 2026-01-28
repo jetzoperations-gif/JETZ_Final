@@ -7,8 +7,7 @@ import { Copy, FileText, Loader2 } from 'lucide-react'
 export default function DailySummary() {
     const [generating, setGenerating] = useState(false)
 
-    const generateReport = async () => {
-        setGenerating(true)
+    const getReportText = async () => {
         const today = new Date().toISOString().split('T')[0]
 
         // 1. Fetch Sales (Paid orders today)
@@ -35,7 +34,7 @@ export default function DailySummary() {
         // 3. Construct Text
         const netCash = totalSales - totalExpenses
 
-        const report = `
+        return `
 📊 JETZ DAILY REPORT (${today})
 Sales: ₱${totalSales.toLocaleString()}
 Expenses: ₱${totalExpenses.toLocaleString()} (${expenseDetails})
@@ -43,8 +42,11 @@ Expenses: ₱${totalExpenses.toLocaleString()} (${expenseDetails})
 NET CASH: ₱${netCash.toLocaleString()}
 Total Cars: ${totalCars}
         `.trim()
+    }
 
-        // 4. Copy to clipboard
+    const generateReport = async () => {
+        setGenerating(true)
+        const report = await getReportText()
         try {
             await navigator.clipboard.writeText(report)
             alert('Report copied to clipboard!')
@@ -52,17 +54,32 @@ Total Cars: ${totalCars}
             console.error('Failed to copy', err)
             alert('Generated but failed to copy. Check console.')
         }
+        setGenerating(false)
+    }
 
+    const handleSMS = async () => {
+        setGenerating(true)
+        const report = await getReportText()
+        window.open(`sms:?body=${encodeURIComponent(report)}`, '_blank')
         setGenerating(false)
     }
 
     return (
-        <button
-            onClick={generateReport}
-            disabled={generating}
-            className="flex items-center gap-2 bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors shadow-sm font-medium"
-        >
-            {generating ? <Loader2 className="animate-spin" size={18} /> : <div className="flex items-center gap-2"><Copy size={18} /> Copy Daily Summary</div>}
-        </button>
+        <div className="flex gap-2">
+            <button
+                onClick={handleSMS}
+                disabled={generating}
+                className="flex items-center gap-2 bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-colors shadow-sm font-medium"
+            >
+                {generating ? <Loader2 className="animate-spin" size={18} /> : <div className="flex items-center gap-2">Send SMS 📱</div>}
+            </button>
+            <button
+                onClick={generateReport}
+                disabled={generating}
+                className="flex items-center gap-2 bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors shadow-sm font-medium"
+            >
+                {generating ? <Loader2 className="animate-spin" size={18} /> : <div className="flex items-center gap-2"><Copy size={18} /> Copy</div>}
+            </button>
+        </div>
     )
 }

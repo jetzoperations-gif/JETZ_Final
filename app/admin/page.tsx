@@ -10,6 +10,9 @@ import WasherLeaderboard from './components/WasherLeaderboard'
 import StaffManagement from './components/StaffManagement'
 import { LayoutDashboard, Coffee, Receipt, Ticket, Users } from 'lucide-react'
 
+import SalesChart from './components/SalesChart'
+import ServiceMixChart from './components/ServiceMixChart'
+
 export default function AdminPage() {
     const [activeTab, setActiveTab] = useState<'dashboard' | 'menu' | 'tokens' | 'reports' | 'team'>('dashboard')
 
@@ -78,10 +81,16 @@ export default function AdminPage() {
                 <div className="flex-1">
                     {activeTab === 'dashboard' && (
                         <div className="space-y-6">
-                            <div className="flex justify-between items-center mb-4">
+                            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">
                                 <h2 className="text-2xl font-bold">Today's Station</h2>
                                 <DailySummary />
                             </div>
+
+                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                <SalesChart />
+                                <ServiceMixChart />
+                            </div>
+
                             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                                 <WasherLeaderboard />
                                 {/* Placeholder for other widgets */}
