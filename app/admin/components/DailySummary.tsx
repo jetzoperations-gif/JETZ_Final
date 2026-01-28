@@ -88,20 +88,52 @@ Total Cars: ${totalCars}
         setGenerating(true)
         const report = await getReportText()
         const targetNumber = currentNumber || ''
-        window.open(`sms:${targetNumber}?body=${encodeURIComponent(report)}`, '_blank')
+
+        // Use location.href instead of window.open to avoid blank tabs
+        window.location.href = `sms:${targetNumber}?body=${encodeURIComponent(report)}`
+
+        setGenerating(false)
+    }
+
+    const handleWhatsApp = async () => {
+        let currentNumber = ownerNumber
+
+        if (!currentNumber) {
+            const num = prompt('Please enter the Owner Mobile Number (e.g. 639123456789):', '')
+            if (!num) return
+            setOwnerNumber(num)
+            localStorage.setItem('jetz_owner_number', num)
+            currentNumber = num
+        }
+
+        // Ensure number format for WhatsApp (remove leading 0 if present, add 63)
+        let formattedNum = currentNumber.replace(/\D/g, '')
+        if (formattedNum.startsWith('0')) formattedNum = '63' + formattedNum.substring(1)
+
+        setGenerating(true)
+        const report = await getReportText()
+        window.open(`https://wa.me/${formattedNum}?text=${encodeURIComponent(report)}`, '_blank')
         setGenerating(false)
     }
 
     return (
         <div className="flex gap-2 items-center">
-            <div className="flex bg-gray-100 rounded-lg p-1 border border-gray-200">
+            <div className="flex bg-gray-100 rounded-lg p-1 border border-gray-200 gap-1">
                 <button
                     onClick={handleSMS}
                     disabled={generating}
-                    className="flex items-center gap-2 bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 transition-colors shadow-sm font-medium"
-                    title={ownerNumber ? `Send to ${ownerNumber}` : "Send SMS"}
+                    className="flex items-center gap-2 bg-green-500 text-white px-3 py-2 rounded-md hover:bg-green-600 transition-colors shadow-sm font-medium"
+                    title={ownerNumber ? `SMS to ${ownerNumber}` : "Send SMS"}
                 >
-                    {generating ? <Loader2 className="animate-spin" size={18} /> : <div className="flex items-center gap-2">Send SMS 📱</div>}
+                    {generating ? <Loader2 className="animate-spin" size={18} /> : <div className="flex items-center gap-2">SMS 💬</div>}
+                </button>
+                <button
+                    onClick={handleWhatsApp}
+                    disabled={generating}
+                    className="flex items-center gap-2 bg-green-600 text-white px-3 py-2 rounded-md hover:bg-green-700 transition-colors shadow-sm font-medium"
+                    title={ownerNumber ? `WhatsApp to ${ownerNumber}` : "Send WhatsApp"}
+                >
+                    {generating ? <Loader2 className="animate-spin" size={18} /> : <div className="flex items-center gap-2">WA 🟢</div>}
                 </button>
                 <button
                     onClick={configureNumber}
