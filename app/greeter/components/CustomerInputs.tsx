@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { ArrowLeft } from 'lucide-react'
+import { toast } from 'sonner'
 
 interface CustomerInputsProps {
     onConfirm: (name: string, plateNumber: string) => void
@@ -29,7 +30,10 @@ export default function CustomerInputs({ onConfirm, onBack }: CustomerInputsProp
 
             if (count && count > 5) {
                 setIsVip(true)
-                // Optional: Toast here if we had a toaster
+                toast.success('Loyal Customer! Offer free tire black.', {
+                    duration: 5000,
+                    icon: '🏆'
+                })
             } else {
                 setIsVip(false)
             }
