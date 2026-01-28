@@ -58,7 +58,7 @@ export default function PaymentModal({ orderId, vehicleName, customerName, plate
     }
 
     const handleMarkAsReady = () => updateStatus('ready')
-    const handleMarkAsWashing = () => updateStatus('washing')
+    const handleMarkAsWorking = () => updateStatus('working')
 
     const handleMarkAsPaid = async () => {
         setProcessing(true)
@@ -133,11 +133,11 @@ export default function PaymentModal({ orderId, vehicleName, customerName, plate
                             <div className="grid grid-cols-2 gap-3 mt-6">
                                 {status === 'queued' && (
                                     <button
-                                        onClick={handleMarkAsWashing}
+                                        onClick={handleMarkAsWorking}
                                         disabled={processing}
                                         className="col-span-2 bg-blue-500 text-white py-3 rounded-xl font-bold hover:bg-blue-600 transition-colors flex justify-center items-center"
                                     >
-                                        <Loader2 className="mr-2" size={20} /> START WASHING
+                                        <Loader2 className="mr-2" size={20} /> START WORKING
                                     </button>
                                 )}
 

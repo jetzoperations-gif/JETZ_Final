@@ -99,7 +99,8 @@ export default function QueueDisplayPage() {
     const getStatusStyle = (status: string) => {
         switch (status) {
             case 'queued': return 'text-gray-400'
-            case 'washing': return 'text-blue-400'
+            case 'working': return 'text-blue-400 animate-pulse' // Adding pulse for activity
+            case 'washing': return 'text-blue-400' // Keeping for backward compatibility
             case 'drying':
             case 'detailing': return 'text-orange-400'
             case 'ready': return 'text-green-500 animate-pulse font-bold' // Blinking green
