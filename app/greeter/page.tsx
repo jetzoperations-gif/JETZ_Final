@@ -22,6 +22,7 @@ export default function GreeterPage() {
     const [selectedToken, setSelectedToken] = useState<number | null>(null)
     const [customerName, setCustomerName] = useState('')
     const [plateNumber, setPlateNumber] = useState('')
+    const [phoneNumber, setPhoneNumber] = useState('')
     const [selectedVehicle, setSelectedVehicle] = useState<VehicleType | null>(null)
     const [selectedService, setSelectedService] = useState<Service | null>(null)
     const [currentPrice, setCurrentPrice] = useState(0)
@@ -34,9 +35,10 @@ export default function GreeterPage() {
         setStep('customer')
     }
 
-    const handleCustomerConfirm = (name: string, plate: string) => {
+    const handleCustomerConfirm = (name: string, plate: string, phone: string) => {
         setCustomerName(name)
         setPlateNumber(plate)
+        setPhoneNumber(phone)
         setStep('vehicle')
     }
 
@@ -61,6 +63,7 @@ export default function GreeterPage() {
             .insert({
                 token_id: selectedToken,
                 customer_name: customerName,
+                customer_phone: phoneNumber || null,
                 plate_number: plateNumber || null,
                 vehicle_type_id: selectedVehicle.id,
                 service_id: selectedService.id,
@@ -105,6 +108,7 @@ export default function GreeterPage() {
             setSelectedToken(null)
             setCustomerName('')
             setPlateNumber('')
+            setPhoneNumber('')
             setSelectedVehicle(null)
             setSelectedService(null)
         }, 2500)

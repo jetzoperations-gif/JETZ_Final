@@ -5,13 +5,14 @@ import { ArrowLeft } from 'lucide-react'
 import { toast } from 'sonner'
 
 interface CustomerInputsProps {
-    onConfirm: (name: string, plateNumber: string) => void
+    onConfirm: (name: string, plateNumber: string, phoneNumber: string) => void
     onBack: () => void
 }
 
 export default function CustomerInputs({ onConfirm, onBack }: CustomerInputsProps) {
     const [name, setName] = useState('')
     const [plateNumber, setPlateNumber] = useState('')
+    const [phoneNumber, setPhoneNumber] = useState('')
     const [isVip, setIsVip] = useState(false)
 
     // Simple debounce check for VIP
@@ -43,7 +44,7 @@ export default function CustomerInputs({ onConfirm, onBack }: CustomerInputsProp
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault()
         if (name.trim()) {
-            onConfirm(name, plateNumber)
+            onConfirm(name, plateNumber, phoneNumber)
         }
     }
 
@@ -76,6 +77,19 @@ export default function CustomerInputs({ onConfirm, onBack }: CustomerInputsProp
                         placeholder="Enter customer name"
                         className="w-full p-4 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none text-lg text-gray-900 placeholder:text-gray-400"
                         required
+                    />
+                </div>
+
+                <div>
+                    <label className="block text-sm font-bold text-gray-700 mb-2">
+                        Mobile Number <span className="text-gray-400 font-normal">(Optional for Notifications)</span>
+                    </label>
+                    <input
+                        type="tel"
+                        value={phoneNumber}
+                        onChange={(e) => setPhoneNumber(e.target.value)}
+                        placeholder="0912 345 6789"
+                        className="w-full p-4 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none text-lg font-mono text-gray-900 placeholder:text-gray-400"
                     />
                 </div>
 
