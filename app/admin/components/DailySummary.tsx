@@ -2,10 +2,27 @@
 
 import { useState } from 'react'
 import { supabase } from '@/lib/supabase'
-import { Copy, FileText, Loader2 } from 'lucide-react'
+import { Copy, FileText, Loader2, Settings } from 'lucide-react'
 
 export default function DailySummary() {
     const [generating, setGenerating] = useState(false)
+    const [ownerNumber, setOwnerNumber] = useState('')
+
+    // Load saved number on mount
+    useState(() => {
+        if (typeof window !== 'undefined') {
+            const saved = localStorage.getItem('jetz_owner_number')
+            if (saved) setOwnerNumber(saved)
+        }
+    })
+
+    const configureNumber = () => {
+        const num = prompt('Enter Owner Mobile Number (e.g., 09123456789):', ownerNumber)
+        if (num !== null) {
+            setOwnerNumber(num)
+            localStorage.setItem('jetz_owner_number', num)
+        }
+    }
 
     const getReportText = async () => {
         const today = new Date().toISOString().split('T')[0]
@@ -58,21 +75,43 @@ Total Cars: ${totalCars}
     }
 
     const handleSMS = async () => {
+        let currentNumber = ownerNumber
+
+        if (!currentNumber) {
+            const num = prompt('Please enter the Owner Mobile Number first:', '')
+            if (!num) return
+            setOwnerNumber(num)
+            localStorage.setItem('jetz_owner_number', num)
+            currentNumber = num
+        }
+
         setGenerating(true)
         const report = await getReportText()
-        window.open(`sms:?body=${encodeURIComponent(report)}`, '_blank')
+        const targetNumber = currentNumber || ''
+        window.open(`sms:${targetNumber}?body=${encodeURIComponent(report)}`, '_blank')
         setGenerating(false)
     }
 
     return (
-        <div className="flex gap-2">
-            <button
-                onClick={handleSMS}
-                disabled={generating}
-                className="flex items-center gap-2 bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-colors shadow-sm font-medium"
-            >
-                {generating ? <Loader2 className="animate-spin" size={18} /> : <div className="flex items-center gap-2">Send SMS 📱</div>}
-            </button>
+        <div className="flex gap-2 items-center">
+            <div className="flex bg-gray-100 rounded-lg p-1 border border-gray-200">
+                <button
+                    onClick={handleSMS}
+                    disabled={generating}
+                    className="flex items-center gap-2 bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 transition-colors shadow-sm font-medium"
+                    title={ownerNumber ? `Send to ${ownerNumber}` : "Send SMS"}
+                >
+                    {generating ? <Loader2 className="animate-spin" size={18} /> : <div className="flex items-center gap-2">Send SMS 📱</div>}
+                </button>
+                <button
+                    onClick={configureNumber}
+                    className="px-3 py-2 text-gray-500 hover:text-gray-700 hover:bg-gray-200 rounded-md transition-colors border-l border-gray-300 bg-gray-50 flex flex-col justify-center items-center leading-none"
+                    title="Configure Owner Number"
+                >
+                    {ownerNumber ? <span className="text-[10px] font-mono font-bold text-gray-600">{ownerNumber}</span> : <span className="text-xs font-bold text-blue-600">SET NO.</span>}
+                </button>
+            </div>
+
             <button
                 onClick={generateReport}
                 disabled={generating}
