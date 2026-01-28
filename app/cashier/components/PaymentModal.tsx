@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 import { Database } from '@/lib/database.types'
-import { Loader2, ReceiptText, CheckCircle, X, Banknote } from 'lucide-react'
+import { Loader2, ReceiptText, CheckCircle, X, Banknote, MessageSquare } from 'lucide-react'
 
 type OrderItem = Database['public']['Tables']['order_items']['Row']
 
@@ -102,17 +102,26 @@ export default function PaymentModal({ orderId, vehicleName, tokenId, onClose, o
                                 <span className="text-3xl font-black text-blue-900">₱{total.toFixed(2)}</span>
                             </div>
 
-                            <button
-                                onClick={handleMarkAsPaid}
-                                disabled={processing}
-                                className="w-full bg-green-600 text-white py-4 rounded-xl font-bold text-lg hover:bg-green-700 shadow-lg hover:shadow-green-200 transition-all flex justify-center items-center mt-6"
-                            >
-                                {processing ? <Loader2 className="animate-spin" /> : (
-                                    <>
-                                        <CheckCircle className="mr-2" /> Mark as Paid
-                                    </>
-                                )}
-                            </button>
+                            <div className="grid grid-cols-2 gap-3 mt-6">
+                                <a
+                                    href={`sms:?body=Hi! Your vehicle ${vehicleName} is ready at Jetz Carwash. Total due: P${total.toFixed(2)}. Thank you!`}
+                                    className="flex items-center justify-center gap-2 bg-blue-100 text-blue-700 py-3 rounded-xl font-bold hover:bg-blue-200 transition-colors"
+                                >
+                                    <MessageSquare size={20} /> Notify
+                                </a>
+
+                                <button
+                                    onClick={handleMarkAsPaid}
+                                    disabled={processing}
+                                    className="bg-green-600 text-white py-3 rounded-xl font-bold hover:bg-green-700 shadow-lg hover:shadow-green-200 transition-all flex justify-center items-center"
+                                >
+                                    {processing ? <Loader2 className="animate-spin" /> : (
+                                        <>
+                                            <CheckCircle className="mr-2" /> Mark Paid
+                                        </>
+                                    )}
+                                </button>
+                            </div>
                         </div>
                     )}
                 </div>

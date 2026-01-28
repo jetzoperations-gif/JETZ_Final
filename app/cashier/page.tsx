@@ -6,6 +6,7 @@ import { supabase } from '@/lib/supabase'
 import { Database } from '@/lib/database.types'
 import { ExternalLink, CreditCard } from 'lucide-react'
 import PaymentModal from './components/PaymentModal'
+import ExpenseModal from './components/ExpenseModal'
 
 type Order = Database['public']['Tables']['orders']['Row'] & {
     vehicle_types: { name: string } | null
@@ -14,6 +15,7 @@ type Order = Database['public']['Tables']['orders']['Row'] & {
 export default function CashierPage() {
     const [orders, setOrders] = useState<Order[]>([])
     const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
+    const [showExpenseModal, setShowExpenseModal] = useState(false)
     const [loading, setLoading] = useState(true)
 
     const fetchOrders = async () => {
@@ -48,7 +50,15 @@ export default function CashierPage() {
     return (
         <MainLayout title="Cashier Station" role="cashier">
             <div className="max-w-6xl mx-auto">
-                <h2 className="text-2xl font-bold text-gray-800 mb-6">Pending Payments</h2>
+                <div className="flex justify-between items-center mb-6">
+                    <h2 className="text-2xl font-bold text-gray-800">Pending Payments</h2>
+                    <button
+                        onClick={() => setShowExpenseModal(true)}
+                        className="flex items-center gap-2 bg-red-100 text-red-700 px-4 py-2 rounded-lg hover:bg-red-200 transition-colors font-bold"
+                    >
+                        <CreditCard size={20} /> Log Expense
+                    </button>
+                </div>
 
                 {loading ? (
                     <div className="text-center p-10 text-gray-500">Loading orders...</div>
@@ -91,6 +101,13 @@ export default function CashierPage() {
                         vehicleName={selectedOrder.vehicle_types?.name || 'Vehicle'}
                         onClose={() => setSelectedOrder(null)}
                         onPaymentSuccess={handlePaymentSuccess}
+                    />
+                )}
+
+                {showExpenseModal && (
+                    <ExpenseModal
+                        onClose={() => setShowExpenseModal(false)}
+                        onSuccess={() => { }} // Optional: refresh report data implies we might need to refresh something, but here just logging.
                     />
                 )}
             </div>

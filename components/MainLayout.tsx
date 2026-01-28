@@ -1,11 +1,12 @@
 import React from 'react';
 import Link from 'next/link';
 import { Coffee, Home } from 'lucide-react';
+import { ThemeToggle } from './ThemeToggle';
 
 interface MainLayoutProps {
     children: React.ReactNode;
     title?: string;
-    role?: 'admin' | 'staff' | 'kiosk';
+    role?: 'admin' | 'staff' | 'kiosk' | 'cashier' | 'greeter' | 'barista';
 }
 
 export default function MainLayout({ children, title, role }: MainLayoutProps) {
@@ -31,6 +32,7 @@ export default function MainLayout({ children, title, role }: MainLayoutProps) {
                     <div className="flex items-center gap-4">
                         {/* Placeholder for user info or logout */}
                         {role && <span className="text-xs uppercase font-semibold text-gray-500 bg-gray-100 px-2 py-1 rounded">{role}</span>}
+                        <ThemeToggle />
                     </div>
                 </div>
             </header>

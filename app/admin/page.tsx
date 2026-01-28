@@ -5,16 +5,29 @@ import MainLayout from '@/components/MainLayout'
 import MenuManagement from './components/MenuManagement'
 import TokenManagement from './components/TokenManagement'
 import SalesReports from './components/SalesReports'
+import DailySummary from './components/DailySummary'
+import WasherLeaderboard from './components/WasherLeaderboard'
 import { LayoutDashboard, Coffee, Receipt, Ticket } from 'lucide-react'
 
 export default function AdminPage() {
-    const [activeTab, setActiveTab] = useState<'menu' | 'tokens' | 'reports'>('menu')
+    const [activeTab, setActiveTab] = useState<'dashboard' | 'menu' | 'tokens' | 'reports'>('dashboard')
 
     return (
         <MainLayout title="Admin Dashboard" role="admin">
             <div className="flex flex-col md:flex-row gap-6">
                 {/* Sidebar Navigation (Desktop) / Horizontal (Mobile) */}
                 <nav className="flex md:flex-col gap-2 md:w-64">
+                    {/* Dashboard Tab */}
+                    <button
+                        onClick={() => setActiveTab('dashboard')}
+                        className={`flex items-center gap-3 p-3 rounded-lg text-left transition-colors
+              ${activeTab === 'dashboard' ? 'bg-blue-100 text-blue-700 font-semibold' : 'hover:bg-gray-100 text-gray-600'}
+            `}
+                    >
+                        <LayoutDashboard size={20} />
+                        <span>Overview</span>
+                    </button>
+
                     {/* Menu Tab */}
                     <button
                         onClick={() => setActiveTab('menu')}
@@ -51,6 +64,18 @@ export default function AdminPage() {
 
                 {/* Content Area */}
                 <div className="flex-1">
+                    {activeTab === 'dashboard' && (
+                        <div className="space-y-6">
+                            <div className="flex justify-between items-center mb-4">
+                                <h2 className="text-2xl font-bold">Today's Station</h2>
+                                <DailySummary />
+                            </div>
+                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                <WasherLeaderboard />
+                                {/* Placeholder for other widgets */}
+                            </div>
+                        </div>
+                    )}
                     {activeTab === 'menu' && <MenuManagement />}
                     {activeTab === 'tokens' && <TokenManagement />}
                     {activeTab === 'reports' && <SalesReports />}
