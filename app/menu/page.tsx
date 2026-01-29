@@ -21,8 +21,7 @@ export default function MenuPage() {
 
             <main className="max-w-md mx-auto p-4">
                 <div className="mb-6">
-                    <h2 className="text-2xl font-bold text-gray-900 leading-tight">Hungry?<br />Grab a bite while you wait.</h2>
-                    <p className="text-gray-500 text-sm mt-1">We'll bring it to your car.</p>
+                    <h2 className="text-3xl font-black text-gray-900 leading-tight">Order Snacks & Drinks</h2>
                 </div>
 
                 <Suspense fallback={<div className="flex justify-center p-10"><Loader2 className="animate-spin text-gray-400" /></div>}>

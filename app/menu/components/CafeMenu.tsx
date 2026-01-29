@@ -191,68 +191,84 @@ export default function CafeMenu() {
     return (
         <div className="relative">
             {/* Category Tabs */}
-            <div className="flex gap-2 overflow-x-auto pb-4 no-scrollbar mb-4">
-                {CATEGORIES.map(cat => (
-                    <button
-                        key={cat}
-                        onClick={() => setActiveCategory(cat)}
-                        className={`px-4 py-2 rounded-full text-sm font-bold whitespace-nowrap transition-colors ${activeCategory === cat
-                            ? 'bg-blue-600 text-white shadow-md'
-                            : 'bg-white text-gray-600 border border-gray-200'
-                            }`}
-                    >
-                        {cat === 'All' && 'All Items'}
-                        {cat === 'Drinks' && <span className="flex items-center gap-1"><Coffee size={14} /> Drinks</span>}
-                        {cat === 'Snacks' && <span className="flex items-center gap-1"><Utensils size={14} /> Snacks</span>}
-                        {cat === 'CarCare' && <span className="flex items-center gap-1"><Wrench size={14} /> Car Care</span>}
-                    </button>
-                ))}
+            <div className="sticky top-0 z-10 bg-slate-50/95 backdrop-blur-sm -mx-4 px-4 py-2 mb-4 shadow-sm">
+                <div className="flex gap-2 overflow-x-auto no-scrollbar pb-2">
+                    {CATEGORIES.map(cat => (
+                        <button
+                            key={cat}
+                            onClick={() => setActiveCategory(cat)}
+                            className={`px-5 py-3 rounded-xl text-sm font-bold whitespace-nowrap transition-all duration-300 ${activeCategory === cat
+                                ? 'bg-gray-900 text-white shadow-lg transform scale-105'
+                                : 'bg-white text-gray-500 border border-gray-100 hover:bg-gray-50'
+                                }`}
+                        >
+                            {cat === 'All' && 'All Items'}
+                            {cat === 'Drinks' && <span className="flex items-center gap-2"><Coffee size={16} /> Drinks</span>}
+                            {cat === 'Snacks' && <span className="flex items-center gap-2"><Utensils size={16} /> Snacks</span>}
+                            {cat === 'CarCare' && <span className="flex items-center gap-2"><Wrench size={16} /> Car Care</span>}
+                        </button>
+                    ))}
+                </div>
             </div>
 
             {/* Grid */}
-            <div className="grid grid-cols-2 gap-4">
-                {filteredItems.map(item => (
-                    <div key={item.id} className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex flex-col justify-between h-full">
-                        <div>
-                            {/* Placeholder Image Box */}
-                            <div className="aspect-square rounded-lg bg-gray-100 mb-3 flex items-center justify-center text-gray-300">
-                                {item.category === 'Drinks' && <Coffee size={32} />}
-                                {item.category === 'Snacks' && <Utensils size={32} />}
-                                {item.category === 'CarCare' && <Wrench size={32} />}
+            <div className="grid grid-cols-2 gap-4 pb-24">
+                {filteredItems.map((item, idx) => (
+                    <div
+                        key={item.id}
+                        className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex flex-col hover:shadow-lg transition-shadow duration-300 animate-in fade-in zoom-in-95"
+                        style={{ animationDelay: `${idx * 50}ms` }}
+                    >
+                        {/* Image Area */}
+                        <div className="aspect-[4/3] bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center relative group cursor-pointer" onClick={() => addToCart(item)}>
+                            <div className="transform transition-transform group-hover:scale-110 duration-300 text-gray-300">
+                                {item.category === 'Drinks' && <Coffee size={48} strokeWidth={1.5} />}
+                                {item.category === 'Snacks' && <Utensils size={48} strokeWidth={1.5} />}
+                                {item.category === 'CarCare' && <Wrench size={48} strokeWidth={1.5} />}
                             </div>
-                            <h3 className="font-bold text-gray-900 leading-tight mb-1">{item.name}</h3>
-                            <p className="font-medium text-gray-500 text-sm">{item.category}</p>
-                        </div>
-                        <div className="flex items-center justify-between mt-3">
-                            <span className="font-bold text-lg text-blue-700">₱{item.price}</span>
 
-                            {/* Quantity Controls */}
-                            {cart.find(c => c.id === item.id) ? (
-                                <div className="flex items-center gap-2 bg-blue-50 rounded-full p-1">
-                                    <button
-                                        onClick={() => removeFromCart(item.id)}
-                                        className="w-8 h-8 flex items-center justify-center rounded-full bg-white text-blue-600 shadow-sm border border-blue-100 hover:bg-blue-100"
-                                    >
-                                        <Minus size={14} />
-                                    </button>
-                                    <span className="font-bold text-blue-900 text-sm w-4 text-center">
-                                        {cart.find(c => c.id === item.id)?.quantity || 0}
-                                    </span>
-                                    <button
-                                        onClick={() => addToCart(item)}
-                                        className="w-8 h-8 flex items-center justify-center rounded-full bg-blue-600 text-white shadow-sm hover:bg-blue-700"
-                                    >
-                                        <Plus size={14} />
-                                    </button>
+                            {/* Quantity Badge on Image */}
+                            {cart.find(c => c.id === item.id) && (
+                                <div className="absolute top-2 right-2 bg-blue-600 text-white w-8 h-8 flex items-center justify-center rounded-full font-bold shadow-lg text-sm animate-in bounce-in">
+                                    {cart.find(c => c.id === item.id)?.quantity}
                                 </div>
-                            ) : (
-                                <button
-                                    onClick={() => addToCart(item)}
-                                    className="bg-blue-50 text-blue-600 p-2 rounded-full hover:bg-blue-600 hover:text-white transition-colors"
-                                >
-                                    <Plus size={20} />
-                                </button>
                             )}
+                        </div>
+
+                        {/* Content */}
+                        <div className="p-4 flex flex-col flex-1">
+                            <div className="flex-1">
+                                <h3 className="font-bold text-gray-900 leading-snug mb-1 line-clamp-2 min-h-[2.5rem]">{item.name}</h3>
+                                <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">{item.category}</p>
+                            </div>
+
+                            <div className="flex items-center justify-between mt-auto">
+                                <span className="font-bold text-xl text-gray-900">₱{item.price}</span>
+
+                                {cart.find(c => c.id === item.id) ? (
+                                    <div className="flex items-center gap-3">
+                                        <button
+                                            onClick={(e) => { e.stopPropagation(); removeFromCart(item.id); }}
+                                            className="w-8 h-8 flex items-center justify-center rounded-full bg-red-50 text-red-500 hover:bg-red-100 transition-colors"
+                                        >
+                                            <Minus size={16} strokeWidth={3} />
+                                        </button>
+                                        <button
+                                            onClick={(e) => { e.stopPropagation(); addToCart(item); }}
+                                            className="w-8 h-8 flex items-center justify-center rounded-full bg-blue-600 text-white shadow-lg shadow-blue-200 hover:bg-blue-700 transition-transform active:scale-90"
+                                        >
+                                            <Plus size={16} strokeWidth={3} />
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <button
+                                        onClick={(e) => { e.stopPropagation(); addToCart(item); }}
+                                        className="bg-yellow-400 text-yellow-900 px-4 py-2 rounded-xl font-bold text-sm shadow-sm hover:bg-yellow-500 hover:shadow-md transition-all active:scale-95"
+                                    >
+                                        ADD
+                                    </button>
+                                )}
+                            </div>
                         </div>
                     </div>
                 ))}
