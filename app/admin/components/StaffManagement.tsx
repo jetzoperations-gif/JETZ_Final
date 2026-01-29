@@ -14,11 +14,53 @@ interface Staff {
 
 export default function StaffManagement() {
     const [staff, setStaff] = useState<Staff[]>([])
-    // ... rest of state
+    const [loading, setLoading] = useState(true)
+    const [isEditing, setIsEditing] = useState<string | null>(null)
+    const [editForm, setEditForm] = useState<Partial<Staff>>({})
+    const [isAdding, setIsAdding] = useState(false)
+    const [newStaff, setNewStaff] = useState<Partial<Staff>>({ role: 'greeter', pin_code: '' })
+    const [showPin, setShowPin] = useState<Record<string, boolean>>({})
 
-    // ... (fetch and handle functions unchanged)
+    const fetchStaff = async () => {
+        const { data } = await supabase
+            .from('staff_profiles')
+            .select('*')
+            .order('name')
+        if (data) setStaff(data as any)
+        setLoading(false)
+    }
 
-    // Layout
+    useEffect(() => {
+        fetchStaff()
+    }, [])
+
+    const handleDelete = async (id: string) => {
+        if (!confirm('Are you sure you want to remove this staff member?')) return
+        await supabase.from('staff_profiles').delete().eq('id', id)
+        fetchStaff()
+    }
+
+    const handleSaveEdit = async (id: string) => {
+        await supabase.from('staff_profiles').update(editForm).eq('id', id)
+        setIsEditing(null)
+        setEditForm({})
+        fetchStaff()
+    }
+
+    const handleAdd = async () => {
+        if (!newStaff.name || !newStaff.pin_code) return
+        await supabase.from('staff_profiles').insert(newStaff)
+        setIsAdding(false)
+        setNewStaff({ role: 'greeter', pin_code: '' })
+        fetchStaff()
+    }
+
+    const togglePinVisibility = (id: string) => {
+        setShowPin(prev => ({ ...prev, [id]: !prev[id] }))
+    }
+
+    if (loading) return <div className="p-8 text-center text-gray-500">Loading Staff...</div>
+
     return (
         <div className="space-y-6">
             {/* Quick Actions for Washers & Payroll */}
@@ -158,10 +200,10 @@ export default function StaffManagement() {
                                             <td className="p-4 font-medium text-gray-900">{member.name}</td>
                                             <td className="p-4">
                                                 <span className={`px-2 py-1 rounded text-xs font-bold uppercase tracking-wide
-                                                ${member.role === 'admin' ? 'bg-purple-100 text-purple-700' :
+                                                    ${member.role === 'admin' ? 'bg-purple-100 text-purple-700' :
                                                         member.role === 'cashier' ? 'bg-green-100 text-green-700' :
                                                             member.role === 'greeter' ? 'bg-blue-100 text-blue-700' : 'bg-orange-100 text-orange-700'}
-                                            `}>
+                                                `}>
                                                     {member.role}
                                                 </span>
                                             </td>
