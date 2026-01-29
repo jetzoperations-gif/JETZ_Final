@@ -44,7 +44,7 @@ export default function PrintTokensPage() {
                         key={id}
                         className="border-2 border-dashed border-gray-300 rounded-xl p-4 flex flex-col items-center justify-center text-center aspect-[3/4] page-break-inside-avoid"
                     >
-                        <img src="/images/logo.png" alt="JETZ Operations" className="w-16 h-auto mb-2 object-contain" />
+                        <img src="/images/jetz_head.jpg" alt="JETZ Head" className="w-16 h-auto mb-2 object-contain" />
 
                         <div className="bg-blue-600 text-white font-mono text-4xl font-black w-20 h-20 flex items-center justify-center rounded-full mb-4 shadow-sm">
                             {id}
