@@ -1,6 +1,7 @@
 import Link from 'next/link'
-import { ArrowLeft } from 'lucide-react'
+import { ArrowLeft, Loader2 } from 'lucide-react'
 import CafeMenu from './components/CafeMenu'
+import { Suspense } from 'react'
 
 export default function MenuPage() {
     return (
@@ -24,7 +25,9 @@ export default function MenuPage() {
                     <p className="text-gray-500 text-sm mt-1">We'll bring it to your car.</p>
                 </div>
 
-                <CafeMenu />
+                <Suspense fallback={<div className="flex justify-center p-10"><Loader2 className="animate-spin text-gray-400" /></div>}>
+                    <CafeMenu />
+                </Suspense>
             </main>
         </div>
     )
