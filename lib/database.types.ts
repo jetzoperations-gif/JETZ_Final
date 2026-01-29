@@ -129,8 +129,9 @@ export interface Database {
                     plate_number: string | null
                     customer_name: string | null
                     washer_name: string | null
+                    commission_amount: number | null
                     total_amount: number
-                    status: 'pending_verification' | 'queued' | 'completed' | 'paid' | 'cancelled'
+                    status: 'pending_verification' | 'queued' | 'working' | 'drying' | 'detailing' | 'ready' | 'completed' | 'paid' | 'cancelled'
                     source: 'staff' | 'kiosk'
                     is_verified: boolean
                     created_at: string
@@ -143,8 +144,9 @@ export interface Database {
                     plate_number?: string | null
                     customer_name?: string | null
                     washer_name?: string | null
+                    commission_amount?: number | null
                     total_amount?: number
-                    status?: 'pending_verification' | 'queued' | 'completed' | 'paid' | 'cancelled'
+                    status?: 'pending_verification' | 'queued' | 'working' | 'drying' | 'detailing' | 'ready' | 'completed' | 'paid' | 'cancelled'
                     source?: 'staff' | 'kiosk'
                     is_verified?: boolean
                     created_at?: string
@@ -157,8 +159,9 @@ export interface Database {
                     plate_number?: string | null
                     customer_name?: string | null
                     washer_name?: string | null
+                    commission_amount?: number | null
                     total_amount?: number
-                    status?: 'pending_verification' | 'queued' | 'completed' | 'paid' | 'cancelled'
+                    status?: 'pending_verification' | 'queued' | 'working' | 'drying' | 'detailing' | 'ready' | 'completed' | 'paid' | 'cancelled'
                     source?: 'staff' | 'kiosk'
                     is_verified?: boolean
                     created_at?: string

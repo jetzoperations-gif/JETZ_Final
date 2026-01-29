@@ -293,7 +293,8 @@ export default function PaymentModal({ orderId, vehicleName, customerName, custo
                                     value={notifyNumber}
                                     onChange={(e) => setNotifyNumber(e.target.value)}
                                     placeholder="0912 345 6789"
-                                    className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 font-mono text-lg"
+                                    className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 font-mono text-lg bg-white text-black placeholder:text-gray-400"
+                                    style={{ color: 'black', backgroundColor: 'white' }}
                                 />
                                 <p className="text-xs text-gray-500 mt-1">If empty, ask customer for number.</p>
                             </div>
