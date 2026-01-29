@@ -4,36 +4,7 @@ import { useSearchParams } from 'next/navigation'
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 import { Database } from '@/lib/database.types'
-import { ShoppingBag, X, Plus, Minus, Coffee, Utensils, Sparkles, CupSoda, CarFront } from 'lucide-react'
-// ... (imports)
-
-// ... (in grid)
-{/* Image Area */ }
-<div
-    className={`aspect-[4/3] flex items-center justify-center relative group cursor-pointer overflow-hidden
-                            ${item.category === 'Drinks' ? 'bg-gradient-to-br from-amber-400 to-orange-600' : ''}
-                            ${item.category === 'Snacks' ? 'bg-gradient-to-br from-red-500 to-pink-600' : ''}
-                            ${item.category === 'CarCare' ? 'bg-gradient-to-br from-blue-400 to-cyan-600' : ''}
-                            `}
-    onClick={() => addToCart(item)}
->
-    <div className="transform transition-transform group-hover:scale-110 duration-300 text-white drop-shadow-md">
-        {item.category === 'Drinks' && <CupSoda size={56} strokeWidth={1.5} />}
-        {item.category === 'Snacks' && <Utensils size={56} strokeWidth={1.5} />}
-        {item.category === 'CarCare' && <Sparkles size={56} strokeWidth={1.5} />}
-    </div>
-
-    {/* Decorative Shine */}
-    <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-white/20 to-transparent pointer-events-none" />
-
-    {/* Quantity Badge on Image */}
-    {cart.find(c => c.id === item.id) && (
-        <div className="absolute top-2 right-2 bg-white text-gray-900 w-8 h-8 flex items-center justify-center rounded-full font-bold shadow-lg text-sm animate-in bounce-in">
-            {cart.find(c => c.id === item.id)?.quantity}
-        </div>
-    )}
-</div>
-import { Loader2 } from 'lucide-react'
+import { ShoppingBag, X, Plus, Minus, Coffee, Utensils, Sparkles, CupSoda, CarFront, Loader2 } from 'lucide-react'
 
 type InventoryItem = Database['public']['Tables']['inventory_items']['Row']
 
