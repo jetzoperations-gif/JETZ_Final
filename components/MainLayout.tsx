@@ -15,9 +15,9 @@ export default function MainLayout({ children, title, role }: MainLayoutProps) {
             <header className="bg-white shadow-sm sticky top-0 z-10">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
                     <div className="flex items-center gap-6">
-                        <Link href="/" className="relative w-32 h-10 hover:opacity-80 transition-opacity">
+                        <Link href="/" className="relative w-12 h-12 hover:opacity-80 transition-opacity hover:scale-110 duration-200">
                             {/* Logo */}
-                            <img src="/images/logo.jpg" alt="JETZ" className="w-full h-full object-contain object-left" />
+                            <img src="/images/logo.png" alt="JETZ" className="w-full h-full object-contain drop-shadow-md" />
                         </Link>
                         {title && (
                             <>

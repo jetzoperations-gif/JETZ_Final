@@ -24,14 +24,14 @@ export default function Home() {
 
         {/* Logo Section */}
         <div className="flex flex-col items-center mb-10">
-          <div className="w-48 h-24 relative mb-6 rounded-2xl overflow-hidden shadow-2xl shadow-blue-900/20 bg-black/40 backdrop-blur-sm border border-white/10 flex items-center justify-center p-4">
-            {/* Using the user provided logo */}
+          <div className="w-48 h-48 relative mb-6 flex items-center justify-center p-2 animate-in fade-in zoom-in duration-700">
+            {/* Using the user provided updated round logo */}
             <Image
-              src="/images/logo.jpg"
+              src="/images/logo.png"
               alt="JETZ Carwash"
               width={200}
-              height={100}
-              className="object-contain w-full h-full"
+              height={200}
+              className="object-contain w-full h-full drop-shadow-2xl"
               priority
             />
           </div>
