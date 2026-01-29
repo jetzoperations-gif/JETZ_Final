@@ -12,7 +12,7 @@ interface PaymentModalProps {
     customerPhone?: string
     plateNumber: string
     tokenId: number
-    orderStatus: string // Add this
+    orderStatus: string
     onClose: () => void
     onPaymentSuccess: () => void
 }
@@ -27,9 +27,21 @@ export default function PaymentModal({ orderId, vehicleName, customerName, custo
     const [showNotifyModal, setShowNotifyModal] = useState(false)
     const [notifyNumber, setNotifyNumber] = useState('')
 
+    // Staff & Commission State
+    const [washers, setWashers] = useState<{ id: string, name: string }[]>([])
+    const [selectedWasher, setSelectedWasher] = useState('')
+    const [commission, setCommission] = useState(0)
+
     useEffect(() => {
-        // Initialize notify number from props if available
+        // Initialize notify number
         if (customerPhone) setNotifyNumber(customerPhone)
+
+        // Fetch Washers
+        const fetchWashers = async () => {
+            const { data } = await supabase.from('staff').select('id, name').eq('active', true).order('name')
+            if (data) setWashers(data)
+        }
+        fetchWashers()
     }, [customerPhone])
 
     useEffect(() => {
@@ -39,10 +51,28 @@ export default function PaymentModal({ orderId, vehicleName, customerName, custo
                 .select('*')
                 .eq('order_id', orderId)
 
+            let serviceTotal = 0
+            let itemsTotal = 0
+
             if (data) {
                 setItems(data)
-                const sum = data.reduce((acc, item) => acc + (item.price_snapshot * item.quantity), 0)
-                setTotal(sum)
+                itemsTotal = data.reduce((acc, item) => {
+                    const lineTotal = item.price_snapshot * item.quantity
+                    // Assume 'services' or items without type are eligible for commission
+                    // or strictly 'service' type. Let's be strict if possible, or fallback.
+                    if (item.item_type === 'service') {
+                        serviceTotal += lineTotal
+                    }
+                    return acc + lineTotal
+                }, 0)
+
+                // If serviceTotal is still 0 but we have a total, maybe check if we failed to tag item types
+                // Fallback: If NO service items found but we have items, maybe it's legacy data. 
+                // Let's assume Commission is 35% of Total if ServiceTotal is 0? 
+                // No, safer to just use serviceTotal.
+
+                setTotal(itemsTotal)
+                setCommission(serviceTotal * 0.35)
             }
             setLoading(false)
         }
@@ -68,12 +98,22 @@ export default function PaymentModal({ orderId, vehicleName, customerName, custo
     const handleMarkAsWorking = () => updateStatus('working')
 
     const handleMarkAsPaid = async () => {
+        if (!selectedWasher) {
+            alert('Please select a Washer first.')
+            return
+        }
         setProcessing(true)
 
-        // 1. Update Order Status
+        // 1. Update Order Status + Washer + Commission
         const { error: orderError } = await supabase
             .from('orders')
-            .update({ status: 'paid', total_amount: total }) // Ensure final total is saved
+            .update({
+                status: 'paid',
+                total_amount: total,
+                washer_name: selectedWasher, // Saving the Name for simple history
+                commission_amount: commission,
+                is_verified: true
+            })
             .eq('id', orderId)
 
         if (orderError) {
@@ -93,7 +133,6 @@ export default function PaymentModal({ orderId, vehicleName, customerName, custo
         }
 
         onPaymentSuccess()
-        // No need to setProcessing(false) as we are closing/redirecting
     }
 
     const handleNotify = (platform: 'sms' | 'whatsapp' | 'viber' | 'copy') => {
@@ -103,19 +142,12 @@ export default function PaymentModal({ orderId, vehicleName, customerName, custo
             setNotifyNumber(num)
         }
 
-        // Use the current notifyNumber state or the prompt result (which we can't easily access here without refactoring, so relying on state + quick check)
-        // Better: Use prompt value if state is empty
         let targetNum = notifyNumber
-        if (!targetNum && platform !== 'copy') {
-            // The prompt above happens, but we need to capture it. 
-            // Simplest is to just re-prompt or trust the user entered it.
-            // Let's rely on the user entering it in the input field inside modal if empty.
-        }
 
         const message = `High Jetz Carwash: Hi ${customerName}! Your vehicle (${vehicleName} - ${plateNumber}) is READY for pickup. Total Due: P${total.toFixed(2)}. Thank you!`
         const encodedMsg = encodeURIComponent(message)
 
-        let intlNum = targetNum.replace(/\D/g, '')
+        let intlNum = (targetNum || '').replace(/\D/g, '')
         if (intlNum.startsWith('0')) intlNum = '63' + intlNum.substring(1)
 
         switch (platform) {
@@ -138,9 +170,9 @@ export default function PaymentModal({ orderId, vehicleName, customerName, custo
 
     return (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in duration-200">
-            <div className="bg-white w-full max-w-md rounded-xl shadow-2xl overflow-hidden relative">
+            <div className="bg-white w-full max-w-md rounded-xl shadow-2xl overflow-hidden relative max-h-[90vh] flex flex-col">
 
-                <div className="bg-blue-600 p-6 text-white text-center relative">
+                <div className="bg-blue-600 p-6 text-white text-center relative shrink-0">
                     <button onClick={onClose} className="absolute top-4 right-4 text-blue-200 hover:text-white">
                         <X size={24} />
                     </button>
@@ -155,19 +187,22 @@ export default function PaymentModal({ orderId, vehicleName, customerName, custo
                     </div>
                 </div>
 
-                <div className="p-6">
+                <div className="p-6 overflow-y-auto flex-1">
                     {loading ? (
                         <div className="py-10 text-center text-gray-400">Loading details...</div>
                     ) : (
                         <div className="space-y-4">
-                            <div className="max-h-[40vh] overflow-y-auto space-y-3 pr-2">
+                            <div className="space-y-3 pr-2">
                                 {items.map((item) => (
                                     <div key={item.id} className="flex justify-between items-center text-sm border-b border-gray-100 pb-2">
                                         <div>
                                             <span className="font-semibold text-gray-800">{item.item_name}</span>
                                             <div className="text-xs text-gray-500 capitalize">{item.item_type}</div>
                                         </div>
-                                        <span className="font-mono text-gray-700">₱{item.price_snapshot.toFixed(2)}</span>
+                                        <div className="text-right">
+                                            <div className="font-mono text-gray-700">₱{(item.price_snapshot * item.quantity).toFixed(2)}</div>
+                                            {item.item_type === 'service' && <div className="text-[10px] text-green-600 font-bold">Com: ₱{(item.price_snapshot * item.quantity * 0.35).toFixed(2)}</div>}
+                                        </div>
                                     </div>
                                 ))}
                             </div>
@@ -177,7 +212,26 @@ export default function PaymentModal({ orderId, vehicleName, customerName, custo
                                 <span className="text-3xl font-black text-blue-900">₱{total.toFixed(2)}</span>
                             </div>
 
-                            <div className="grid grid-cols-2 gap-3 mt-6">
+                            {/* WASHER SELECTION */}
+                            <div className="bg-gray-50 p-4 rounded-xl border border-gray-200">
+                                <label className="block text-xs font-bold text-gray-500 uppercase mb-2">Assign Washer (Required)</label>
+                                <select
+                                    value={selectedWasher}
+                                    onChange={e => setSelectedWasher(e.target.value)}
+                                    className="w-full p-3 border border-gray-300 rounded-lg font-bold text-gray-800 focus:ring-2 focus:ring-blue-500 bg-white"
+                                >
+                                    <option value="">-- Who washed this? --</option>
+                                    {washers.map(w => <option key={w.id} value={w.name}>{w.name}</option>)}
+                                </select>
+                                {selectedWasher && commission > 0 && (
+                                    <div className="mt-2 text-xs text-green-600 font-bold flex justify-between bg-green-50 p-2 rounded">
+                                        <span>Washer Share (35%):</span>
+                                        <span>₱{commission.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                                    </div>
+                                )}
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-3 mt-4">
                                 {status === 'queued' && (
                                     <button
                                         onClick={handleMarkAsWorking}
@@ -208,7 +262,7 @@ export default function PaymentModal({ orderId, vehicleName, customerName, custo
                                 <button
                                     onClick={handleMarkAsPaid}
                                     disabled={processing}
-                                    className="bg-green-600 text-white py-3 rounded-xl font-bold hover:bg-green-700 shadow-lg hover:shadow-green-200 transition-all flex justify-center items-center"
+                                    className="bg-green-600 text-white py-3 rounded-xl font-bold hover:bg-green-700 shadow-lg hover:shadow-green-200 transition-all flex justify-center items-center disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
                                     {processing ? <Loader2 className="animate-spin" /> : (
                                         <>
