@@ -7,21 +7,20 @@ import TokenManagement from './components/TokenManagement'
 import SalesReports from './components/SalesReports'
 import DailySummary from './components/DailySummary'
 import WasherLeaderboard from './components/WasherLeaderboard'
-import StaffManagement from './components/StaffManagement'
-import { LayoutDashboard, Coffee, Receipt, Ticket, Users } from 'lucide-react'
+import SystemSettings from './components/SystemSettings'
+import { LayoutDashboard, Coffee, Receipt, Ticket, Users, Settings } from 'lucide-react'
 
-import SalesChart from './components/SalesChart'
-import ServiceMixChart from './components/ServiceMixChart'
+// ...
 
 export default function AdminPage() {
-    const [activeTab, setActiveTab] = useState<'dashboard' | 'menu' | 'tokens' | 'reports' | 'team'>('dashboard')
+    const [activeTab, setActiveTab] = useState<'dashboard' | 'menu' | 'tokens' | 'reports' | 'team' | 'settings'>('dashboard')
 
     return (
         <MainLayout title="Admin Dashboard" role="admin">
             <div className="flex flex-col md:flex-row gap-6">
                 {/* Sidebar Navigation (Desktop) / Horizontal (Mobile) */}
                 <nav className="flex md:flex-col gap-2 md:w-64">
-                    {/* Dashboard Tab */}
+                    {/* ... existing tabs ... */}
                     <button
                         onClick={() => setActiveTab('dashboard')}
                         className={`flex items-center gap-3 p-3 rounded-lg text-left transition-colors
@@ -32,7 +31,6 @@ export default function AdminPage() {
                         <span>Overview</span>
                     </button>
 
-                    {/* Menu Tab */}
                     <button
                         onClick={() => setActiveTab('menu')}
                         className={`flex items-center gap-3 p-3 rounded-lg text-left transition-colors
@@ -43,7 +41,6 @@ export default function AdminPage() {
                         <span>Menu & Inventory</span>
                     </button>
 
-                    {/* Tokens Tab */}
                     <button
                         onClick={() => setActiveTab('tokens')}
                         className={`flex items-center gap-3 p-3 rounded-lg text-left transition-colors
@@ -54,7 +51,6 @@ export default function AdminPage() {
                         <span>Token Status</span>
                     </button>
 
-                    {/* Reports Tab */}
                     <button
                         onClick={() => setActiveTab('reports')}
                         className={`flex items-center gap-3 p-3 rounded-lg text-left transition-colors
@@ -65,7 +61,6 @@ export default function AdminPage() {
                         <span>Sales Reports</span>
                     </button>
 
-                    {/* Team Tab */}
                     <button
                         onClick={() => setActiveTab('team')}
                         className={`flex items-center gap-3 p-3 rounded-lg text-left transition-colors
@@ -74,6 +69,16 @@ export default function AdminPage() {
                     >
                         <Users size={20} />
                         <span>Team Management</span>
+                    </button>
+
+                    <button
+                        onClick={() => setActiveTab('settings')}
+                        className={`flex items-center gap-3 p-3 rounded-lg text-left transition-colors
+              ${activeTab === 'settings' ? 'bg-blue-100 text-blue-700 font-semibold' : 'hover:bg-gray-100 text-gray-600'}
+            `}
+                    >
+                        <Settings size={20} />
+                        <span>Configuration</span>
                     </button>
                 </nav>
 
@@ -101,6 +106,7 @@ export default function AdminPage() {
                     {activeTab === 'tokens' && <TokenManagement />}
                     {activeTab === 'reports' && <SalesReports />}
                     {activeTab === 'team' && <StaffManagement />}
+                    {activeTab === 'settings' && <SystemSettings />}
                 </div>
             </div>
         </MainLayout>

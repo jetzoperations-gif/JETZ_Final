@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { ArrowLeft } from 'lucide-react'
 import { toast } from 'sonner'
 
@@ -14,6 +14,18 @@ export default function CustomerInputs({ onConfirm, onBack }: CustomerInputsProp
     const [plateNumber, setPlateNumber] = useState('')
     const [phoneNumber, setPhoneNumber] = useState('')
     const [isVip, setIsVip] = useState(false)
+    const [threshold, setThreshold] = useState(5)
+
+    useEffect(() => {
+        const getSettings = async () => {
+            const m = await import('@/lib/supabase')
+            const { data } = await m.supabase.from('system_settings').select('value').eq('key', 'vip_threshold').single()
+            if (data && data.value) {
+                setThreshold(parseInt(data.value))
+            }
+        }
+        getSettings()
+    }, [])
 
     // Simple debounce check for VIP
     const handlePlateChange = async (val: string) => {
@@ -29,7 +41,7 @@ export default function CustomerInputs({ onConfirm, onBack }: CustomerInputsProp
                 .eq('plate_number', upper)
             )
 
-            if (count && count > 5) {
+            if (count && count > threshold) {
                 setIsVip(true)
                 toast.success('Loyal Customer! Offer free tire black.', {
                     duration: 5000,
