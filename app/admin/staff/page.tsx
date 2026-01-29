@@ -89,7 +89,7 @@ export default function StaffPage() {
                             value={newName}
                             onChange={e => setNewName(e.target.value)}
                             placeholder="Full Name (e.g. Juan De La Cruz)"
-                            className="flex-1 border-2 border-slate-200 p-3 rounded-lg focus:border-blue-500 outline-none font-medium"
+                            className="flex-1 border-2 border-slate-200 p-3 rounded-lg focus:border-blue-500 outline-none font-medium text-gray-900 placeholder:text-gray-400"
                         />
                         <button
                             type="submit"

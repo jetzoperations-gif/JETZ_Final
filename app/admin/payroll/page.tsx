@@ -101,14 +101,14 @@ export default function PayrollPage() {
                         type="date"
                         value={startDate}
                         onChange={e => setStartDate(e.target.value)}
-                        className="border border-gray-300 rounded-md px-2 py-1 text-sm font-bold"
+                        className="border border-gray-300 rounded-md px-2 py-1 text-sm font-bold text-gray-900"
                     />
                     <span className="text-gray-400">-</span>
                     <input
                         type="date"
                         value={endDate}
                         onChange={e => setEndDate(e.target.value)}
-                        className="border border-gray-300 rounded-md px-2 py-1 text-sm font-bold"
+                        className="border border-gray-300 rounded-md px-2 py-1 text-sm font-bold text-gray-900"
                     />
                 </div>
 
@@ -117,7 +117,7 @@ export default function PayrollPage() {
                     <div className="p-8 border-b border-gray-100 text-center">
                         <h2 className="text-3xl font-black text-blue-900 tracking-tighter mb-1">JETZ CARWASH</h2>
                         <p className="text-gray-500 font-bold uppercase tracking-widest text-sm">Washer Commission Payroll</p>
-                        <p className="text-sm mt-2 font-mono">{startDate} to {endDate}</p>
+                        <p className="text-sm mt-2 font-mono text-gray-900">{startDate} to {endDate}</p>
                     </div>
 
                     <div className="p-0">
