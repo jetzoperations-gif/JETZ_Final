@@ -82,7 +82,7 @@ export default function AdminPage() {
                     {activeTab === 'dashboard' && (
                         <div className="space-y-6">
                             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">
-                                <h2 className="text-2xl font-bold">Today's Station</h2>
+                                <h2 className="text-2xl font-bold text-gray-900">Today's Station</h2>
                                 <DailySummary />
                             </div>
 
