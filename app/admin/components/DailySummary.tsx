@@ -130,7 +130,7 @@ Total Cars: ${totalCars}
                     >
                         {generating ? <Loader2 className="animate-spin" size={18} /> : (
                             <div className="flex items-center gap-2">
-                                <Share2 size={18} /> Share Report
+                                <Share2 size={18} /> Share Daily Report
                             </div>
                         )}
                     </button>

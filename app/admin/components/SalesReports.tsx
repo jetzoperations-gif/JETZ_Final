@@ -55,6 +55,41 @@ export default function SalesReports() {
     const totalJobs = transactions.length
     const averageOrder = totalJobs > 0 ? totalRevenue / totalJobs : 0
 
+    // CSV Export
+    const handleExportCSV = () => {
+        if (transactions.length === 0) {
+            alert('No data to export.')
+            return
+        }
+
+        const headers = ['Time', 'Customer', 'Plate Number', 'Vehicle Type', 'Service', 'Amount', 'Status']
+        const csvRows = [headers.join(',')]
+
+        transactions.forEach(t => {
+            const row = [
+                `"${formatDate(t.created_at)}"`,
+                `"${t.customer_name || 'Walk-in'}"`,
+                `"${t.plate_number || ''}"`,
+                `"${t.vehicle_types?.name || ''}"`,
+                `"${t.services?.name || ''}"`,
+                t.total_amount || 0,
+                `"${t.status}"`
+            ]
+            csvRows.push(row.join(','))
+        })
+
+        const csvString = csvRows.join('\n')
+        const blob = new Blob([csvString], { type: 'text/csv' })
+        const url = URL.createObjectURL(blob)
+        const a = document.createElement('a')
+        a.href = url
+        a.download = `jetz-sales-${filter}-${new Date().toISOString().split('T')[0]}.csv`
+        document.body.appendChild(a)
+        a.click()
+        document.body.removeChild(a)
+        URL.revokeObjectURL(url)
+    }
+
     return (
         <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
             {/* Header / Filter */}
@@ -125,7 +160,10 @@ export default function SalesReports() {
             <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
                 <div className="p-5 border-b border-gray-100 flex justify-between items-center">
                     <h3 className="font-bold text-gray-800">Recent Transactions</h3>
-                    <button className="text-xs flex items-center gap-1 text-gray-500 hover:text-blue-600 transition-colors">
+                    <button
+                        onClick={handleExportCSV}
+                        className="text-xs flex items-center gap-1 text-gray-500 hover:text-blue-600 transition-colors"
+                    >
                         <Download size={14} /> Export CSV
                     </button>
                 </div>
