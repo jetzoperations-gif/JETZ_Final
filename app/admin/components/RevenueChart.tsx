@@ -5,15 +5,15 @@ import { supabase } from '@/lib/supabase'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 import { Loader2 } from 'lucide-react'
 
-export default function SalesChart() {
-    const [data, setData] = useState<{ date: string; sales: number }[]>([])
+export default function RevenueChart() {
+    const [data, setData] = useState<{ date: string; revenue: number }[]>([])
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
-        fetchSales()
+        fetchRevenue()
     }, [])
 
-    const fetchSales = async () => {
+    const fetchRevenue = async () => {
         const today = new Date()
         const last7Days = new Date(today)
         last7Days.setDate(today.getDate() - 6) // Go back 6 days
@@ -46,7 +46,7 @@ export default function SalesChart() {
 
             const chartData = Object.keys(grouped).map(key => ({
                 date: key,
-                sales: grouped[key]
+                revenue: grouped[key]
             }))
 
             setData(chartData)
@@ -65,10 +65,10 @@ export default function SalesChart() {
                     <XAxis dataKey="date" tick={{ fontSize: 12 }} />
                     <YAxis tick={{ fontSize: 12 }} tickFormatter={(value) => `₱${value}`} />
                     <Tooltip
-                        formatter={(value: number) => [`₱${value.toLocaleString()}`, 'Sales']}
+                        formatter={(value: number) => [`₱${(value || 0).toLocaleString()}`, 'Revenue']}
                         contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
                     />
-                    <Bar dataKey="sales" fill="#4f46e5" radius={[4, 4, 0, 0]} barSize={40} />
+                    <Bar dataKey="revenue" fill="#4f46e5" radius={[4, 4, 0, 0]} barSize={40} />
                 </BarChart>
             </ResponsiveContainer>
         </div>

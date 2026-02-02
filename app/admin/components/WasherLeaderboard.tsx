@@ -7,7 +7,7 @@ import { Trophy, Medal, Award } from 'lucide-react'
 interface WasherStats {
     name: string
     count: number
-    total_sales: number
+    total_revenue: number
 }
 
 export default function WasherLeaderboard() {
@@ -34,13 +34,13 @@ export default function WasherLeaderboard() {
 
                 data.forEach(order => {
                     const name = order.washer_name || 'Unassigned'
-                    if (!map[name]) map[name] = { name, count: 0, total_sales: 0 }
+                    if (!map[name]) map[name] = { name, count: 0, total_revenue: 0 }
                     map[name].count += 1
-                    map[name].total_sales += (order.total_amount || 0)
+                    map[name].total_revenue += (order.total_amount || 0)
                 })
 
                 // Convert to array and sort
-                const sorted = Object.values(map).sort((a, b) => b.total_sales - a.total_sales)
+                const sorted = Object.values(map).sort((a, b) => b.total_revenue - a.total_revenue)
                 setStats(sorted)
             }
             setLoading(false)
@@ -73,7 +73,7 @@ export default function WasherLeaderboard() {
                                 </div>
                             </div>
                             <div className="font-mono font-bold text-blue-600">
-                                ₱{stat.total_sales.toLocaleString()}
+                                ₱{stat.total_revenue.toLocaleString()}
                             </div>
                         </div>
                     ))

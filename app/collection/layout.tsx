@@ -4,7 +4,7 @@ import ProtectedRoute from '@/components/ProtectedRoute'
 
 export default function CashierLayout({ children }: { children: React.ReactNode }) {
     return (
-        <ProtectedRoute requiredRole="cashier">
+        <ProtectedRoute requiredRole="collection">
             {children}
         </ProtectedRoute>
     )

@@ -4,14 +4,14 @@ import { useState } from 'react'
 import MainLayout from '@/components/MainLayout'
 import MenuManagement from './components/MenuManagement'
 import TokenManagement from './components/TokenManagement'
-import SalesReports from './components/SalesReports'
+import RevenueReports from './components/RevenueReports'
 import DailySummary from './components/DailySummary'
 import WasherLeaderboard from './components/WasherLeaderboard'
 import StaffManagement from './components/StaffManagement'
 import SystemSettings from './components/SystemSettings'
 import { LayoutDashboard, Coffee, Receipt, Ticket, Users, Settings } from 'lucide-react'
 
-import SalesChart from './components/SalesChart'
+import RevenueChart from './components/RevenueChart'
 import ServiceMixChart from './components/ServiceMixChart'
 
 export default function AdminPage() {
@@ -28,7 +28,7 @@ export default function AdminPage() {
                         { id: 'dashboard', icon: LayoutDashboard, label: 'Overview' },
                         { id: 'menu', icon: Coffee, label: 'Menu & Inventory' },
                         { id: 'tokens', icon: Ticket, label: 'Token Status' },
-                        { id: 'reports', icon: Receipt, label: 'Sales Reports' },
+                        { id: 'reports', icon: Receipt, label: 'Revenue Reports' },
                         { id: 'team', icon: Users, label: 'Team Management' },
                         { id: 'settings', icon: Settings, label: 'Configuration' },
                     ].map((item) => (
@@ -63,7 +63,7 @@ export default function AdminPage() {
 
                                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                                     <div className="bg-slate-50 p-6 rounded-2xl border border-slate-100">
-                                        <SalesChart />
+                                        <RevenueChart />
                                     </div>
                                     <div className="bg-slate-50 p-6 rounded-2xl border border-slate-100">
                                         <ServiceMixChart />
@@ -78,7 +78,7 @@ export default function AdminPage() {
                         )}
                         {activeTab === 'menu' && <MenuManagement />}
                         {activeTab === 'tokens' && <TokenManagement />}
-                        {activeTab === 'reports' && <SalesReports />}
+                        {activeTab === 'reports' && <RevenueReports />}
                         {activeTab === 'team' && <StaffManagement />}
                         {activeTab === 'settings' && <SystemSettings />}
                     </div>

@@ -27,7 +27,7 @@ export default function DailySummary() {
     const getReportText = async () => {
         const today = new Date().toISOString().split('T')[0]
 
-        // 1. Fetch Sales (Paid orders today)
+        // 1. Fetch Revenue (Paid orders today)
         const { data: orders } = await supabase
             .from('orders')
             .select('total_amount')
@@ -35,7 +35,7 @@ export default function DailySummary() {
             .gte('created_at', `${today}T00:00:00`)
             .lte('created_at', `${today}T23:59:59`)
 
-        const totalSales = orders?.reduce((acc, o) => acc + (o.total_amount || 0), 0) || 0
+        const totalRevenue = orders?.reduce((acc, o) => acc + (o.total_amount || 0), 0) || 0
         const totalCars = orders?.length || 0
 
         // 2. Fetch Expenses
@@ -49,11 +49,11 @@ export default function DailySummary() {
         const expenseDetails = expenses?.map(e => `${e.description} (P${e.amount})`).join(', ') || 'None'
 
         // 3. Construct Text
-        const netCash = totalSales - totalExpenses
+        const netCash = totalRevenue - totalExpenses
 
         return `
 📊 JETZ DAILY REPORT (${today})
-Sales: ₱${totalSales.toLocaleString()}
+Revenue: ₱${totalRevenue.toLocaleString()}
 Expenses: ₱${totalExpenses.toLocaleString()} (${expenseDetails})
 ----------------
 NET CASH: ₱${netCash.toLocaleString()}

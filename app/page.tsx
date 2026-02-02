@@ -8,7 +8,7 @@ export default function Home() {
     { name: 'Admin', href: '/admin', icon: Shield, color: 'text-rose-500', bg: 'bg-rose-50 group-hover:bg-rose-100' },
     { name: 'Greeter', href: '/greeter', icon: User, color: 'text-blue-500', bg: 'bg-blue-50 group-hover:bg-blue-100' },
     { name: 'MiniCafe', href: '/barista', icon: Coffee, color: 'text-amber-500', bg: 'bg-amber-50 group-hover:bg-amber-100' },
-    { name: 'Cashier', href: '/cashier', icon: Banknote, color: 'text-emerald-500', bg: 'bg-emerald-50 group-hover:bg-emerald-100' },
+    { name: 'Collection', href: '/collection', icon: Banknote, color: 'text-emerald-500', bg: 'bg-emerald-50 group-hover:bg-emerald-100' },
   ];
 
   return (

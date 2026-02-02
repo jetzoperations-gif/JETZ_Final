@@ -22,7 +22,7 @@ export default function ExpenseModal({ onClose, onSuccess }: ExpenseModalProps) 
         const { error } = await supabase.from('expenses').insert({
             description,
             amount: parseFloat(amount),
-            logged_by: 'Cashier' // simplified for now, could take from context
+            logged_by: 'Collection' // simplified for now, could take from context
         })
 
         setLoading(false)

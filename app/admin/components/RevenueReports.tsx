@@ -12,16 +12,16 @@ const formatDate = (dateUnparsed: string) => {
     }).format(date)
 }
 
-export default function SalesReports() {
+export default function RevenueReports() {
     const [transactions, setTransactions] = useState<any[]>([])
     const [loading, setLoading] = useState(true)
     const [filter, setFilter] = useState<'today' | 'week' | 'month'>('today')
 
     useEffect(() => {
-        fetchSales()
+        fetchRevenue()
     }, [filter])
 
-    const fetchSales = async () => {
+    const fetchRevenue = async () => {
         setLoading(true)
         let query = supabase
             .from('orders')
@@ -46,7 +46,7 @@ export default function SalesReports() {
         const { data, error } = await query
 
         if (data) setTransactions(data)
-        if (error) console.error('Error fetching sales:', error)
+        if (error) console.error('Error fetching revenue:', error)
         setLoading(false)
     }
 
@@ -83,7 +83,7 @@ export default function SalesReports() {
         const url = URL.createObjectURL(blob)
         const a = document.createElement('a')
         a.href = url
-        a.download = `jetz-sales-${filter}-${new Date().toISOString().split('T')[0]}.csv`
+        a.download = `jetz-revenue-${filter}-${new Date().toISOString().split('T')[0]}.csv`
         document.body.appendChild(a)
         a.click()
         document.body.removeChild(a)
@@ -96,7 +96,7 @@ export default function SalesReports() {
             <div className="flex flex-col md:flex-row justify-between items-center gap-4 bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
                 <div>
                     <h2 className="text-xl font-bold text-gray-800 flex items-center gap-2">
-                        <TrendingUp className="text-blue-600" /> Sales Overview
+                        <TrendingUp className="text-blue-600" /> Revenue Overview
                     </h2>
                     <p className="text-sm text-gray-500">Track your business performance realtime.</p>
                 </div>
@@ -182,7 +182,7 @@ export default function SalesReports() {
                             {loading ? (
                                 <tr>
                                     <td colSpan={5} className="py-12 text-center text-gray-400">
-                                        Loading sales data...
+                                        Loading revenue data...
                                     </td>
                                 </tr>
                             ) : transactions.length === 0 ? (
@@ -191,7 +191,7 @@ export default function SalesReports() {
                                         <div className="bg-gray-100 p-3 rounded-full mb-3">
                                             <Calendar size={24} className="text-gray-300" />
                                         </div>
-                                        No sales found for this period.
+                                        No transactions found for this period.
                                     </td>
                                 </tr>
                             ) : (

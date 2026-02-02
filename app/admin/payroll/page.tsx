@@ -9,7 +9,7 @@ import { ArrowLeft } from 'lucide-react'
 interface PayrollEntry {
     name: string
     total_services: number
-    total_sales: number
+    total_revenue: number
     total_commission: number
 }
 
@@ -56,10 +56,10 @@ export default function PayrollPage() {
 
             data.forEach(order => {
                 const name = order.washer_name || 'Unknown'
-                if (!map[name]) map[name] = { name, total_services: 0, total_sales: 0, total_commission: 0 }
+                if (!map[name]) map[name] = { name, total_services: 0, total_revenue: 0, total_commission: 0 }
 
                 map[name].total_services += 1
-                map[name].total_sales += (order.total_amount || 0)
+                map[name].total_revenue += (order.total_amount || 0)
                 map[name].total_commission += (order.commission_amount || 0)
 
                 totalPayout += (order.commission_amount || 0)
@@ -131,7 +131,7 @@ export default function PayrollPage() {
                                     <tr>
                                         <th className="px-6 py-4 font-bold">Washer Name</th>
                                         <th className="px-6 py-4 font-bold text-center">Vehicles</th>
-                                        <th className="px-6 py-4 font-bold text-right">Gross Sales</th>
+                                        <th className="px-6 py-4 font-bold text-right">Gross Revenue</th>
                                         <th className="px-6 py-4 font-bold text-right text-blue-700">Commission (35%)</th>
                                         <th className="px-6 py-4 font-bold print:hidden">Signature</th>
                                     </tr>
@@ -141,7 +141,7 @@ export default function PayrollPage() {
                                         <tr key={p.name} className="hover:bg-blue-50/50">
                                             <td className="px-6 py-4 font-bold text-gray-800">{p.name}</td>
                                             <td className="px-6 py-4 text-center font-mono text-gray-600">{p.total_services}</td>
-                                            <td className="px-6 py-4 text-right font-mono text-gray-500">₱{p.total_sales.toLocaleString()}</td>
+                                            <td className="px-6 py-4 text-right font-mono text-gray-500">₱{p.total_revenue.toLocaleString()}</td>
                                             <td className="px-6 py-4 text-right font-mono font-black text-blue-700 text-lg">₱{p.total_commission.toLocaleString()}</td>
                                             <td className="px-6 py-4 border-b border-gray-100 print:hidden text-gray-300 italic">______________</td>
                                         </tr>
@@ -151,7 +151,7 @@ export default function PayrollPage() {
                                     <tr>
                                         <td className="px-6 py-4 font-bold uppercase">Total Payout</td>
                                         <td className="px-6 py-4 text-center font-mono opacity-70">{payroll.reduce((a, b) => a + b.total_services, 0)}</td>
-                                        <td className="px-6 py-4 text-right font-mono opacity-70">₱{payroll.reduce((a, b) => a + b.total_sales, 0).toLocaleString()}</td>
+                                        <td className="px-6 py-4 text-right font-mono opacity-70">₱{payroll.reduce((a, b) => a + b.total_revenue, 0).toLocaleString()}</td>
                                         <td className="px-6 py-4 text-right font-mono font-black text-xl text-yellow-400">₱{grandTotal.toLocaleString()}</td>
                                         <td className="px-6 py-4 print:hidden"></td>
                                     </tr>

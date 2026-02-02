@@ -6,7 +6,7 @@ import { ThemeToggle } from './ThemeToggle';
 interface MainLayoutProps {
     children: React.ReactNode;
     title?: string;
-    role?: 'admin' | 'staff' | 'kiosk' | 'cashier' | 'greeter' | 'barista';
+    role?: 'admin' | 'staff' | 'kiosk' | 'collection' | 'greeter' | 'barista';
 }
 
 export default function MainLayout({ children, title, role }: MainLayoutProps) {

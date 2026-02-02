@@ -8,7 +8,7 @@ import Link from 'next/link'
 interface Staff {
     id: string
     name: string
-    role: 'admin' | 'staff' | 'cashier' | 'greeter' | 'barista'
+    role: 'admin' | 'staff' | 'collection' | 'greeter' | 'barista'
     pin_code: string
 }
 
@@ -92,7 +92,7 @@ export default function StaffManagement() {
                         <h3 className="text-xl font-bold text-gray-800 flex items-center gap-2">
                             <Shield className="text-gray-500" /> System Access
                         </h3>
-                        <p className="text-gray-400 text-sm">Manage PIN codes for Kiosk/Cashier Login</p>
+                        <p className="text-gray-400 text-sm">Manage PIN codes for Kiosk/Collection Login</p>
                     </div>
                     <button
                         onClick={() => setIsAdding(true)}
@@ -123,7 +123,7 @@ export default function StaffManagement() {
                                     onChange={e => setNewStaff({ ...newStaff, role: e.target.value as any })}
                                 >
                                     <option value="admin">Admin</option>
-                                    <option value="cashier">Cashier</option>
+                                    <option value="collection">Collection</option>
                                     <option value="greeter">Greeter</option>
                                     <option value="barista">Barista</option>
                                 </select>
@@ -175,7 +175,7 @@ export default function StaffManagement() {
                                                     onChange={e => setEditForm({ ...editForm, role: e.target.value as any })}
                                                 >
                                                     <option value="admin">Admin</option>
-                                                    <option value="cashier">Cashier</option>
+                                                    <option value="collection">Collection</option>
                                                     <option value="greeter">Greeter</option>
                                                     <option value="barista">Barista</option>
                                                 </select>
@@ -201,7 +201,7 @@ export default function StaffManagement() {
                                             <td className="p-4">
                                                 <span className={`px-2 py-1 rounded text-xs font-bold uppercase tracking-wide
                                                     ${member.role === 'admin' ? 'bg-purple-100 text-purple-700' :
-                                                        member.role === 'cashier' ? 'bg-green-100 text-green-700' :
+                                                        member.role === 'collection' ? 'bg-green-100 text-green-700' :
                                                             member.role === 'greeter' ? 'bg-blue-100 text-blue-700' : 'bg-orange-100 text-orange-700'}
                                                 `}>
                                                     {member.role}

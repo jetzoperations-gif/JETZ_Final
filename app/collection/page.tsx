@@ -12,14 +12,14 @@ type Order = Database['public']['Tables']['orders']['Row'] & {
     vehicle_types: { name: string } | null
 }
 
-export default function CashierPage() {
+export default function CollectionPage() {
     const [orders, setOrders] = useState<Order[]>([])
     const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
     const [showExpenseModal, setShowExpenseModal] = useState(false)
     const [loading, setLoading] = useState(true)
 
     const fetchOrders = async () => {
-        // Cashier sees everything that is NOT 'paid' or 'cancelled'
+        // Collection sees everything that is NOT 'paid' or 'cancelled'
         // Usually 'queued' or 'completed' (if we had a completion step)
         const { data } = await supabase
             .from('orders')
@@ -36,7 +36,7 @@ export default function CashierPage() {
 
     useEffect(() => {
         fetchOrders()
-        const channel = supabase.channel('cashier-orders')
+        const channel = supabase.channel('collection-orders')
             .on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, fetchOrders)
             .subscribe()
         return () => { supabase.removeChannel(channel) }
@@ -48,7 +48,7 @@ export default function CashierPage() {
     }
 
     return (
-        <MainLayout title="Cashier Station" role="cashier">
+        <MainLayout title="Collection Station" role="collection">
             <div className="max-w-6xl mx-auto">
                 <div className="flex justify-between items-center mb-6">
                     <h2 className="text-2xl font-bold text-gray-800">Pending Payments</h2>
